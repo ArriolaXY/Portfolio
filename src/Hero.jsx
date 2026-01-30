@@ -310,6 +310,7 @@ function Navbar() {
 function PhilosophySection() {
   return (
     <section
+      id="philosophy"
       aria-labelledby="philosophy-title"
       className="bg-[#05060c] pt-20 pb-20 lg:pt-20 lg:pb-20"
     >
@@ -581,6 +582,7 @@ function ProjectBlock({ label, children, highlight = false }) {
 function StackTecnico() {
   return (
     <section
+      id="stack"
       aria-labelledby="stack-title"
       className="bg-[#0a0b10] pt-20 pb-20 lg:pt-20 lg:pb-20 text-gray-300"
     >
@@ -735,6 +737,7 @@ function StackCard({ icon, title, items, nowrapTitle = false }) {
 function Footer() {
   return (
     <footer
+      id="contact"
       className="bg-[#05060c] pt-20 pb-20 lg:pt-20 lg:pb-20 border-t border-white/10"
       aria-labelledby="footer-title"
     >
