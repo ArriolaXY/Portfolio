@@ -248,27 +248,59 @@ function MiniGraph({ offsetX, offsetY, scale, index }) {
 
 /* ================= NAVBAR ================= */
 function Navbar() {
+  const links = [
+    { label: "Filosofía", href: "#philosophy" },
+    { label: "Sobre mí", href: "#about" },
+    { label: "Proyectos", href: "#projects" },
+    { label: "Contacto", href: "#contact" },
+  ];
+
+  const handleClick = (e, href) => {
+    // Scroll suave con offset por navbar fija (64px = h-16)
+    e.preventDefault();
+    const el = document.querySelector(href);
+    if (!el) return;
+
+    const y = el.getBoundingClientRect().top + window.scrollY - 64;
+    window.scrollTo({ top: y, behavior: "smooth" });
+
+    // Actualiza URL sin salto brusco
+    history.pushState(null, "", href);
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#05060c]/80 border-b border-white/10">
       <nav className="h-16">
-  <Container className="h-full flex items-center justify-between">
-    <span className="text-lg font-semibold tracking-tight cursor-pointer transition-all duration-300 hover:text-violet-500">
-      Nahuel Arriola
-    </span>
+        <Container className="h-full flex items-center justify-between">
+          <a
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              history.pushState(null, "", "#top");
+            }}
+            className="text-lg font-semibold tracking-tight cursor-pointer transition-all duration-300 hover:text-violet-500"
+          >
+            Nahuel Arriola
+          </a>
 
-    <ul className="flex gap-8 text-sm text-slate-300">
-      {["Filosofía", "Sobre mí", "Proyectos", "Contacto"].map((item) => (
-        <li
-          key={item}
-          className="group relative cursor-pointer hover:text-white transition"
-        >
-          {item}
-          <span className="absolute -bottom-1 left-0 w-0 h-px bg-violet-500 transition-all duration-300 group-hover:w-full" />
-        </li>
-      ))}
-    </ul>
-  </Container>
-</nav>
+          <ul className="flex gap-8 text-sm text-slate-300">
+            {links.map((item) => (
+              <li key={item.href} className="group relative">
+                <a
+                  href={item.href}
+                  onClick={(e) => handleClick(e, item.href)}
+                  className="hover:text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 rounded"
+                >
+                  {item.label}
+                </a>
+
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-violet-500 transition-all duration-300 group-hover:w-full" />
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </nav>
     </header>
   );
 }
