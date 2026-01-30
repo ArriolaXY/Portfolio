@@ -734,14 +734,14 @@ function Footer() {
               <nav aria-label="Enlaces de contacto" className="w-full md:w-auto">
                 <ul className="flex flex-wrap items-center gap-3 md:gap-4">
                   <li>
-                    <FooterLink href="https://github.com/tuusuario" label="GitHub">
+                    <FooterLink href="https://github.com/ArriolaXY" label="GitHub">
                       <FaGithub size={18} aria-hidden="true" focusable="false" />
                     </FooterLink>
                   </li>
 
                   <li>
                     <FooterLink
-                      href="https://linkedin.com/in/tuusuario"
+                      href="https://www.linkedin.com/in/nahuel-arriola-6794b9355/"
                       label="LinkedIn"
                     >
                       <FaLinkedinIn size={18} aria-hidden="true" focusable="false" />
@@ -749,7 +749,7 @@ function Footer() {
                   </li>
 
                   <li>
-                    <FooterLink href="mailto:tuemail@email.com" label="Email">
+                    <FooterLink href="mailto:nahuel.arriola777@gmail.com" label="Email">
                       <FaEnvelope size={18} aria-hidden="true" focusable="false" />
                     </FooterLink>
                   </li>
