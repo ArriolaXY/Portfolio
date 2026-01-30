@@ -9,6 +9,7 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
+
 function SectionDivider() {
   return (
     <div className="relative">
@@ -17,6 +18,7 @@ function SectionDivider() {
     </div>
   );
 }
+
 
 /* ================= CONTAINER ================= */
 function Container({ children, className = "" }) {
@@ -27,6 +29,7 @@ function Container({ children, className = "" }) {
   );
 }
 
+
 function Content({ children }) {
   return (
     <div className="w-full max-w-4xl">
@@ -34,6 +37,22 @@ function Content({ children }) {
     </div>
   );
 }
+
+
+const NAVBAR_OFFSET = 64;
+
+function smoothScrollToHash(e, href, offset = NAVBAR_OFFSET) {
+  e.preventDefault();
+
+  const el = document.querySelector(href);
+  if (!el) return;
+
+  const y = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top: y, behavior: "smooth" });
+
+  history.pushState(null, "", href);
+}
+
 
 /* ================= PAGE ================= */
 export default function Home() {
@@ -88,12 +107,14 @@ function Hero() {
         <div className="mt-11 flex gap-4">
           <a
             href="#projects"
+            onClick={(e) => smoothScrollToHash(e, "#projects")}
             className="px-6 py-3 rounded-md bg-violet-600 text-white font-medium hover:bg-violet-500 transition shadow-[0_0_20px_rgba(139,92,246,0.35)]"
           >
             Ver proyectos
           </a>
           <a
             href="#contact"
+            onClick={(e) => smoothScrollToHash(e, "#contact")}
             className="px-6 py-3 rounded-md border border-white/20 text-white hover:bg-white/5 transition"
           >
             Contacto
@@ -255,18 +276,7 @@ function Navbar() {
     { label: "Contacto", href: "#contact" },
   ];
 
-  const handleClick = (e, href) => {
-    // Scroll suave con offset por navbar fija (64px = h-16)
-    e.preventDefault();
-    const el = document.querySelector(href);
-    if (!el) return;
-
-    const y = el.getBoundingClientRect().top + window.scrollY - 64;
-    window.scrollTo({ top: y, behavior: "smooth" });
-
-    // Actualiza URL sin salto brusco
-    history.pushState(null, "", href);
-  };
+  const handleClick = (e, href) => smoothScrollToHash(e, href);
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#05060c]/80 border-b border-white/10">
