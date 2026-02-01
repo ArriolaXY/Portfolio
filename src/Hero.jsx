@@ -23,7 +23,7 @@ function SectionDivider() {
 /* ================= CONTAINER ================= */
 function Container({ children, className = "" }) {
   return (
-    <div className={`max-w-7xl mx-auto px-8 ${className}`}>
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
       {children}
     </div>
   );
@@ -76,7 +76,7 @@ export default function Home() {
 /* ================= HERO ================= */
 function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#05060c] via-[#090b18] to-[#05060c]">
+    <section className="relative min-h-[92svh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#05060c] via-[#090b18] to-[#05060c] pt-24 pb-16">
       {/* Glow */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none" />
 
@@ -96,30 +96,31 @@ function Hero() {
           FULL STACK WEB DEVELOPER
         </span>
 
-        <h1 className="mt-6 text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight">
-          Construyo aplicaciones escalables, mantenibles y orientadas a resultados.
-        </h1>
+        <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-tight">
+  Construyo aplicaciones escalables, mantenibles y orientadas a resultados.
+</h1>
 
-        <p className="mt-8 max-w-xl text-slate-400 leading-relaxed">
-          Egresado de la Universidad Tecnológica Nacional (UTN), con formación sólida en desarrollo de software.
-        </p>
+<p className="mt-6 max-w-xl text-slate-400 leading-relaxed text-[15px] sm:text-[16px]">
+  Egresado de la Universidad Tecnológica Nacional (UTN), con formación sólida en desarrollo de software.
+</p>
 
-        <div className="mt-11 flex gap-4">
-          <a
-            href="#projects"
-            onClick={(e) => smoothScrollToHash(e, "#projects")}
-            className="px-6 py-3 rounded-md bg-violet-600 text-white font-medium hover:bg-violet-500 transition shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-          >
-            Ver proyectos
-          </a>
-          <a
-            href="#contact"
-            onClick={(e) => smoothScrollToHash(e, "#contact")}
-            className="px-6 py-3 rounded-md border border-white/20 text-white hover:bg-white/5 transition"
-          >
-            Contacto
-          </a>
-        </div>
+        <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+  <a
+    href="#projects"
+    onClick={(e) => smoothScrollToHash(e, "#projects")}
+    className="w-full sm:w-auto text-center px-6 py-3 rounded-md bg-violet-600 text-white font-medium hover:bg-violet-500 transition shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+  >
+    Ver proyectos
+  </a>
+
+  <a
+    href="#contact"
+    onClick={(e) => smoothScrollToHash(e, "#contact")}
+    className="w-full sm:w-auto text-center px-6 py-3 rounded-md border border-white/20 text-white hover:bg-white/5 transition"
+  >
+    Contacto
+  </a>
+</div>
       </motion.div>
       </div>
     </Container>
@@ -217,7 +218,7 @@ function MiniGraph({ offsetX, offsetY, scale, index }) {
   return (
     <g
   transform={`translate(${offsetX} ${offsetY}) scale(${scale})`}
-  opacity={0.25}
+  opacity={0.14}
 >
       {/* links */}
       {links.map(([a, b], i) => {
@@ -294,7 +295,7 @@ function Navbar() {
             Nahuel Arriola
           </a>
 
-          <ul className="flex gap-8 text-sm text-slate-300">
+          <ul className="hidden md:flex gap-8 text-sm text-slate-300">
             {links.map((item) => (
               <li key={item.href} className="group relative">
                 <a
@@ -469,7 +470,7 @@ function Projects() {
           </header>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10">
             <ProjectCard
               title="Gestión Contable Ampuero"
               problem="El estudio contable gestionaba compras y ventas mediante planillas de Excel, lo que generaba riesgo de errores en la carga manual de comprobantes, dificultades para discriminar correctamente impuestos y posibles alteraciones accidentales de datos."
@@ -515,7 +516,7 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
         "
       />
 
-      <div className="relative p-8">
+      <div className="relative p-6 sm:p-8">
         {/* Header */}
         <div className="flex items-start justify-between gap-6 mb-6">
           <h3
