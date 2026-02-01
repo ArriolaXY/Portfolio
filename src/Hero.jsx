@@ -795,7 +795,7 @@ function Footer() {
 
                   <li>
                     <FooterLink
-                      href="https://wa.me/54911XXXXXXXX"
+                      href="https://wa.me/543816439602"
                       label="WhatsApp"
                     >
                       <FaWhatsapp size={18} aria-hidden="true" focusable="false" />
