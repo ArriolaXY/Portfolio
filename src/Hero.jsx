@@ -1,5 +1,5 @@
 import { ArrowUpRight, Code, Layout, Rocket, Monitor, Server, Cloud, Wrench } from "lucide-react";
-import { FaGithub, FaLinkedinIn, FaEnvelope } from "react-icons/fa";
+import { FaGithub, FaLinkedinIn, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 
@@ -790,6 +790,15 @@ function Footer() {
                       label="LinkedIn"
                     >
                       <FaLinkedinIn size={18} aria-hidden="true" focusable="false" />
+                    </FooterLink>
+                  </li>
+
+                  <li>
+                    <FooterLink
+                      href="https://wa.me/54911XXXXXXXX"
+                      label="WhatsApp"
+                    >
+                      <FaWhatsapp size={18} aria-hidden="true" focusable="false" />
                     </FooterLink>
                   </li>
 
