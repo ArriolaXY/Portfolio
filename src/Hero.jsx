@@ -76,7 +76,7 @@ export default function Home() {
 /* ================= HERO ================= */
 function Hero() {
   return (
-    <section className="relative min-h-[92svh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#05060c] via-[#090b18] to-[#05060c] pt-24 pb-16">
+    <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#05060c] via-[#090b18] to-[#05060c] pt-24 pb-16 pt-24 pb-16 sm:pt-28 sm:pb-20">
       {/* Glow */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none" />
 
@@ -323,7 +323,7 @@ function PhilosophySection() {
     <section
       id="philosophy"
       aria-labelledby="philosophy-title"
-      className="bg-[#05060c] pt-20 pb-20 lg:pt-20 lg:pb-20"
+      className="bg-[#05060c] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
@@ -384,7 +384,7 @@ function AboutSection() {
     <section
       id="about"
       aria-labelledby="about-title"
-      className="bg-[#0a0b10] pt-20 pb-20 lg:pt-20 lg:pb-20"
+      className="bg-[#0a0b10] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
@@ -454,7 +454,7 @@ function Projects() {
     <section
       id="projects"
       aria-labelledby="projects-title"
-      className="bg-[#05060c] pt-20 pb-20 lg:pt-20 lg:pb-20"
+      className="bg-[#05060c] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
@@ -595,7 +595,7 @@ function StackTecnico() {
     <section
       id="stack"
       aria-labelledby="stack-title"
-      className="bg-[#0a0b10] pt-20 pb-20 lg:pt-20 lg:pb-20 text-gray-300"
+      className="bg-[#0a0b10] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20 text-gray-300"
     >
       <Container className="flex justify-center">
         <Content>
@@ -749,7 +749,7 @@ function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-[#05060c] pt-20 pb-20 lg:pt-20 lg:pb-20 border-t border-white/10"
+      className="bg-[#05060c] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20 border-t border-white/10"
       aria-labelledby="footer-title"
     >
       <Container className="flex justify-center">
