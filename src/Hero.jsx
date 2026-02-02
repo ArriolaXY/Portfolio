@@ -1,7 +1,15 @@
-import { ArrowUpRight, Code, Layout, Rocket, Monitor, Server, Cloud, Wrench } from "lucide-react";
+import {
+  ArrowUpRight,
+  Monitor,
+  Server,
+  Cloud,
+  Wrench,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { FaGithub, FaLinkedinIn, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /* ================= ANIMATIONS ================= */
 const fadeUp = {
@@ -9,16 +17,14 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-
 function SectionDivider() {
   return (
     <div className="relative">
-      <div className="h-px w-full bg-white/10" />
+      <div className="h-px w-full bg-[color:var(--border)]" />
       <div className="absolute left-1/2 -top-px h-px w-24" />
     </div>
   );
 }
-
 
 /* ================= CONTAINER ================= */
 function Container({ children, className = "" }) {
@@ -29,15 +35,9 @@ function Container({ children, className = "" }) {
   );
 }
 
-
 function Content({ children }) {
-  return (
-    <div className="w-full max-w-4xl">
-      {children}
-    </div>
-  );
+  return <div className="w-full max-w-4xl">{children}</div>;
 }
-
 
 const NAVBAR_OFFSET = 64;
 
@@ -53,12 +53,83 @@ function smoothScrollToHash(e, href, offset = NAVBAR_OFFSET) {
   history.pushState(null, "", href);
 }
 
+/* ================= THEME HELPERS ================= */
+const THEME_KEY = "na_theme";
+
+function getInitialTheme() {
+  if (typeof window === "undefined") return "dark";
+
+  const saved = window.localStorage.getItem(THEME_KEY);
+  if (saved === "dark" || saved === "light") return saved;
+
+  const prefersDark =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  return prefersDark ? "dark" : "light";
+}
+
+function applyThemeToDocument(theme) {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("dark", theme === "dark");
+}
 
 /* ================= PAGE ================= */
 export default function Home() {
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  useEffect(() => {
+    applyThemeToDocument(theme);
+    try {
+      window.localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      // ignore
+    }
+  }, [theme]);
+
+  const isDark = theme === "dark";
+
+  const themeVars = useMemo(() => {
+    // Podés ajustar estos colores si querés otro "light theme" más minimal
+    return isDark
+      ? {
+          "--bg": "#05060c",
+          "--bg2": "#0a0b10",
+          "--bg3": "#090b18",
+          "--card": "rgba(255,255,255,0.02)",
+          "--text": "rgb(248 250 252)", // slate-50
+          "--muted": "rgb(148 163 184)", // slate-400
+          "--muted2": "rgb(100 116 139)", // slate-500
+          "--border": "rgba(255,255,255,0.10)",
+          "--grid": "rgba(255,255,255,0.03)",
+        }
+      : {
+          "--bg": "#f8fafc",
+          "--bg2": "#ffffff",
+          "--bg3": "#eef2ff",
+          "--card": "rgba(2,6,23,0.03)",
+          "--text": "rgb(15 23 42)", // slate-900
+          "--muted": "rgb(51 65 85)", // slate-700
+          "--muted2": "rgb(71 85 105)", // slate-600
+          "--border": "rgba(2,6,23,0.10)",
+          "--grid": "rgba(2,6,23,0.05)",
+        };
+  }, [isDark]);
+
   return (
-    <main className="min-h-screen text-slate-100 selection:bg-violet-500 selection:text-black bg-[#05060c]">
-      <Navbar />
+    <main
+      style={themeVars}
+      className="
+        min-h-screen
+        selection:bg-violet-500 selection:text-black
+        bg-[var(--bg)]
+        text-[color:var(--text)]
+      "
+    >
+      <Navbar
+        isDark={isDark}
+        onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+      />
       <Hero />
       <PhilosophySection />
       <SectionDivider />
@@ -76,60 +147,62 @@ export default function Home() {
 /* ================= HERO ================= */
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#05060c] via-[#090b18] to-[#05060c] pt-24 pb-16 pt-24 pb-16 sm:pt-28 sm:pb-20">
+    <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[var(--bg)] via-[var(--bg3)] to-[var(--bg)] pt-24 pb-16 sm:pt-28 sm:pb-20">
       {/* Glow */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none" />
 
       {/* Graph background */}
       <GraphBackground />
 
-    <Container className="relative z-20 flex justify-center">
-  <div className="w-full max-w-4xl">
-      {/* Content */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-20"
-      >
-        <span className="text-xs tracking-widest text-violet-500 font-medium">
-          FULL STACK WEB DEVELOPER
-        </span>
+      <Container className="relative z-20 flex justify-center">
+        <div className="w-full max-w-4xl">
+          {/* Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative z-20"
+          >
+            <span className="text-xs tracking-widest text-violet-500 font-medium">
+              FULL STACK WEB DEVELOPER
+            </span>
 
-        <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-tight">
-  Construyo aplicaciones escalables, mantenibles y orientadas a resultados.
-</h1>
+            <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-tight text-[color:var(--text)]">
+              Construyo aplicaciones escalables, mantenibles y orientadas a
+              resultados.
+            </h1>
 
-<p className="mt-6 max-w-xl text-slate-400 leading-relaxed text-[15px] sm:text-[16px]">
-  Egresado de la Universidad Tecnológica Nacional (UTN), con formación sólida en desarrollo de software.
-</p>
+            <p className="mt-6 max-w-xl leading-relaxed text-[15px] sm:text-[16px] text-[color:var(--muted)]">
+              Egresado de la Universidad Tecnológica Nacional (UTN), con
+              formación sólida en desarrollo de software.
+            </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-  <a
-    href="#projects"
-    onClick={(e) => smoothScrollToHash(e, "#projects")}
-    className="w-full sm:w-auto text-center px-6 py-3 rounded-md bg-violet-600 text-white font-medium hover:bg-violet-500 transition shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-  >
-    Ver proyectos
-  </a>
+            <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <a
+                href="#projects"
+                onClick={(e) => smoothScrollToHash(e, "#projects")}
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-md bg-violet-600 text-white font-medium hover:bg-violet-500 transition shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+              >
+                Ver proyectos
+              </a>
 
-  <a
-    href="#contact"
-    onClick={(e) => smoothScrollToHash(e, "#contact")}
-    className="w-full sm:w-auto text-center px-6 py-3 rounded-md border border-white/20 text-white hover:bg-white/5 transition"
-  >
-    Contacto
-  </a>
-</div>
-      </motion.div>
-      </div>
-    </Container>
-    {/* CIERRE VISUAL DEL HERO */}
-      <div className="absolute bottom-0 left-0 w-full border-t border-white/10" />
+              <a
+                href="#contact"
+                onClick={(e) => smoothScrollToHash(e, "#contact")}
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-md border border-[color:var(--border)] text-[color:var(--text)] hover:bg-black/5 dark:hover:bg-white/5 transition"
+              >
+                Contacto
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </Container>
+
+      {/* CIERRE VISUAL DEL HERO */}
+      <div className="absolute bottom-0 left-0 w-full border-t border-[color:var(--border)]" />
     </section>
   );
 }
-
 
 /* ================= GRAPH BACKGROUND ================= */
 function GraphBackground() {
@@ -150,16 +223,11 @@ function GraphBackground() {
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
-        <pattern
-          id="grid"
-          width="10"
-          height="10"
-          patternUnits="userSpaceOnUse"
-        >
+        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
           <path
             d="M 10 0 L 0 0 0 10"
             fill="none"
-            stroke="rgba(255,255,255,0.03)"
+            stroke="var(--grid)"
             strokeWidth="0.2"
           />
         </pattern>
@@ -218,7 +286,7 @@ function MiniGraph({ offsetX, offsetY, scale, index }) {
   return (
     <g
   transform={`translate(${offsetX} ${offsetY}) scale(${scale})`}
-  opacity={0.14}
+  opacity={0.2}
 >
       {/* links */}
       {links.map(([a, b], i) => {
@@ -234,11 +302,11 @@ function MiniGraph({ offsetX, offsetY, scale, index }) {
             x2={to.x}
             y2={to.y}
             stroke={
-              isCore
-                ? "rgba(139,92,246,0.15)"
-                : "rgba(139,92,246,0.08)"
-            }
-            strokeWidth={isCore ? 0.4 : 0.25}
+  isCore
+    ? "rgba(139,92,246,0.22)"
+    : "rgba(139,92,246,0.12)"
+}
+strokeWidth={isCore ? 0.45 : 0.3}
             strokeLinecap="round"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -259,7 +327,7 @@ function MiniGraph({ offsetX, offsetY, scale, index }) {
             cy={n.y}
             r={isCore ? 0.9 : isService ? 0.7 : 0.55}
             fill="#a78bfa"
-            opacity={0.55}
+            opacity={0.7}
           />
         );
       })}
@@ -267,9 +335,8 @@ function MiniGraph({ offsetX, offsetY, scale, index }) {
   );
 }
 
-
 /* ================= NAVBAR ================= */
-function Navbar() {
+function Navbar({ isDark, onToggleTheme }) {
   const links = [
     { label: "Filosofía", href: "#philosophy" },
     { label: "Sobre mí", href: "#about" },
@@ -280,7 +347,7 @@ function Navbar() {
   const handleClick = (e, href) => smoothScrollToHash(e, href);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#05060c]/80 border-b border-white/10">
+    <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[color:var(--bg)]/80 border-b border-[color:var(--border)]">
       <nav className="h-16">
         <Container className="h-full flex items-center justify-between">
           <a
@@ -290,32 +357,58 @@ function Navbar() {
               window.scrollTo({ top: 0, behavior: "smooth" });
               history.pushState(null, "", "#top");
             }}
-            className="text-lg font-semibold tracking-tight cursor-pointer transition-all duration-300 hover:text-violet-500"
+            className="text-lg font-semibold tracking-tight cursor-pointer transition-all duration-300 hover:text-violet-500 text-[color:var(--text)]"
           >
             Nahuel Arriola
           </a>
 
-          <ul className="hidden md:flex gap-8 text-sm text-slate-300">
-            {links.map((item) => (
-              <li key={item.href} className="group relative">
-                <a
-                  href={item.href}
-                  onClick={(e) => handleClick(e, item.href)}
-                  className="hover:text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 rounded"
-                >
-                  {item.label}
-                </a>
+          <div className="flex items-center gap-3">
+            <ul className="hidden md:flex gap-8 text-sm text-[color:var(--muted)]">
+              {links.map((item) => (
+                <li key={item.href} className="group relative">
+                  <a
+                    href={item.href}
+                    onClick={(e) => handleClick(e, item.href)}
+                    className="hover:text-[color:var(--text)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 rounded"
+                  >
+                    {item.label}
+                  </a>
 
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-violet-500 transition-all duration-300 group-hover:w-full" />
-              </li>
-            ))}
-          </ul>
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-violet-500 transition-all duration-300 group-hover:w-full" />
+                </li>
+              ))}
+            </ul>
+
+            {/* Theme Toggle (icon only, no border) */}
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              aria-label={
+                isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
+              }
+              className="
+                inline-flex items-center justify-center
+                p-2
+                rounded-md
+                text-[color:var(--muted)]
+                hover:text-[color:var(--text)]
+                hover:bg-black/5 dark:hover:bg-white/5
+                transition
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70
+              "
+            >
+              {isDark ? (
+                <Sun size={18} aria-hidden="true" focusable="false" />
+              ) : (
+                <Moon size={18} aria-hidden="true" focusable="false" />
+              )}
+            </button>
+          </div>
         </Container>
       </nav>
     </header>
   );
 }
-
 
 /* ================= PHILOSOPHY ================= */
 function PhilosophySection() {
@@ -323,7 +416,7 @@ function PhilosophySection() {
     <section
       id="philosophy"
       aria-labelledby="philosophy-title"
-      className="bg-[#05060c] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
+      className="bg-[var(--bg)] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
@@ -332,7 +425,7 @@ function PhilosophySection() {
             <header>
               <h2
                 id="philosophy-title"
-                className="text-white text-3xl font-semibold"
+                className="text-3xl font-semibold text-[color:var(--text)]"
               >
                 Filosofía
               </h2>
@@ -347,17 +440,12 @@ function PhilosophySection() {
               transition={{ duration: 0.55, ease: "easeOut" }}
               className="min-w-0"
             >
-              <blockquote
-                className="
-                  relative
-                  text-white text-3xl leading-tight font-medium
-                "
-              >
+              <blockquote className="relative text-3xl leading-tight font-medium text-[color:var(--text)]">
                 “Un buen desarrollo no se nota solo al lanzar, sino con el paso
                 del tiempo.”
               </blockquote>
 
-              <p className="mt-8 text-slate-400 leading-relaxed text-[17px]">
+              <p className="mt-8 leading-relaxed text-[17px] text-[color:var(--muted)]">
                 Como Desarrollador web Full Stack, creo aplicaciones web
                 modernas, rápidas y seguras, pensadas para crecer junto a tu
                 proyecto. Desarrollo tanto el frontend como el backend con foco
@@ -377,14 +465,13 @@ function PhilosophySection() {
   );
 }
 
-
 /* ================= ABOUT ================= */
 function AboutSection() {
   return (
     <section
       id="about"
       aria-labelledby="about-title"
-      className="bg-[#0a0b10] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
+      className="bg-[var(--bg2)] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
@@ -393,7 +480,7 @@ function AboutSection() {
             <header>
               <h2
                 id="about-title"
-                className="text-white text-3xl font-semibold"
+                className="text-3xl font-semibold text-[color:var(--text)]"
               >
                 Sobre mí
               </h2>
@@ -406,18 +493,13 @@ function AboutSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.55, ease: "easeOut" }}
-              className="
-                space-y-6
-                text-slate-400 leading-relaxed text-[17px]
-                min-w-0
-              "
+              className="space-y-6 leading-relaxed text-[17px] min-w-0 text-[color:var(--muted)]"
             >
               <p>
-                Soy Desarrollador web Full Stack y me dedico a crear
-                aplicaciones web funcionales, claras y pensadas para crecer.
-                Trabajo tanto en el frontend como en el backend, enfocándome en
-                que cada parte del sistema sea entendible, mantenible y útil
-                para el negocio.
+                Soy Desarrollador web Full Stack y me dedico a crear aplicaciones
+                web funcionales, claras y pensadas para crecer. Trabajo tanto en
+                el frontend como en el backend, enfocándome en que cada parte
+                del sistema sea entendible, mantenible y útil para el negocio.
               </p>
 
               <p>
@@ -447,14 +529,13 @@ function AboutSection() {
   );
 }
 
-
 /* ================= PROJECTS ================= */
 function Projects() {
   return (
     <section
       id="projects"
       aria-labelledby="projects-title"
-      className="bg-[#05060c] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
+      className="bg-[var(--bg)] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
@@ -462,7 +543,7 @@ function Projects() {
           <header className="mb-14">
             <h2
               id="projects-title"
-              className="text-3xl font-semibold text-white"
+              className="text-3xl font-semibold text-[color:var(--text)]"
             >
               Proyectos Destacados
             </h2>
@@ -497,8 +578,8 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
       transition={{ duration: 0.55, ease: "easeOut" }}
       className="
         group relative overflow-hidden
-        rounded-2xl border border-white/10
-        bg-[#0a0b10]
+        rounded-2xl border border-[color:var(--border)]
+        bg-[var(--bg2)]
         transition
         hover:border-violet-500/40
         hover:shadow-[0_0_0_1px_rgba(139,92,246,0.25)]
@@ -521,7 +602,7 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
         <div className="flex items-start justify-between gap-6 mb-6">
           <h3
             id={`${title}-title`}
-            className="text-xl font-semibold text-white tracking-tight"
+            className="text-xl font-semibold tracking-tight text-[color:var(--text)]"
           >
             {title}
           </h3>
@@ -529,13 +610,13 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
           <span
             className="
               inline-flex items-center justify-center
-              rounded-full border border-white/10
-              bg-white/[0.02]
+              rounded-full border border-[color:var(--border)]
+              bg-[var(--card)]
               p-2
-              text-slate-400
+              text-[color:var(--muted)]
               transition
-              group-hover:text-white group-hover:border-violet-500/30
-              group-focus-within:text-white
+              group-hover:text-[color:var(--text)] group-hover:border-violet-500/30
+              group-focus-within:text-[color:var(--text)]
             "
           >
             <ArrowUpRight
@@ -564,10 +645,11 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
               className="
                 px-3 py-1 text-xs rounded-full
                 border border-violet-500/30
-                text-violet-400 bg-violet-500/5
+                text-violet-600 dark:text-violet-400
+                bg-violet-500/10
                 transition
                 group-hover:border-violet-400/60
-                group-hover:text-violet-300
+                group-hover:text-violet-600 dark:group-hover:text-violet-300
               "
             >
               {t}
@@ -582,12 +664,19 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
 function ProjectBlock({ label, children, highlight = false }) {
   return (
     <div>
-      <p className="text-xs tracking-widest text-slate-500 mb-2">{label}</p>
-      <p className={highlight ? "text-white" : "text-slate-300"}>{children}</p>
+      <p className="text-xs tracking-widest mb-2 text-[color:var(--muted2)]">
+        {label}
+      </p>
+      <p
+        className={
+          highlight ? "text-[color:var(--text)]" : "text-[color:var(--muted)]"
+        }
+      >
+        {children}
+      </p>
     </div>
   );
 }
-
 
 /* ================= STACK TÉCNICO ================= */
 function StackTecnico() {
@@ -595,24 +684,23 @@ function StackTecnico() {
     <section
       id="stack"
       aria-labelledby="stack-title"
-      className="bg-[#0a0b10] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20 text-gray-300"
+      className="bg-[var(--bg2)] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
     >
       <Container className="flex justify-center">
         <Content>
           {/* TÍTULO */}
           <header className="mb-14">
-            <h2 id="stack-title" className="text-3xl font-semibold text-white">
+            <h2
+              id="stack-title"
+              className="text-3xl font-semibold text-[color:var(--text)]"
+            >
               Stack Técnico
             </h2>
             <div className="mt-3 h-[3px] w-12 bg-violet-500" />
           </header>
 
           {/* GRID STACK */}
-          <div
-            className="
-              grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10
-            "
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {/* FRONTEND */}
             <StackCard
               icon={<Monitor size={20} aria-hidden="true" focusable="false" />}
@@ -648,14 +736,14 @@ function StackTecnico() {
           </div>
 
           {/* DIVIDER */}
-          <div className="my-20 h-px w-full bg-white/10" />
+          <div className="my-20 h-px w-full bg-[color:var(--border)]" />
 
           {/* EDUCACIÓN */}
           <section aria-labelledby="education-title">
             <header className="mb-10">
               <h2
                 id="education-title"
-                className="text-3xl font-semibold text-white"
+                className="text-3xl font-semibold text-[color:var(--text)]"
               >
                 Educación
               </h2>
@@ -665,17 +753,17 @@ function StackTecnico() {
             <div
               className="
                 max-w-xl
-                rounded-2xl border border-white/10
-                bg-white/[0.02]
+                rounded-2xl border border-[color:var(--border)]
+                bg-[var(--card)]
                 px-6 py-5
                 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]
               "
             >
-              <h3 className="font-semibold text-white mb-1">
+              <h3 className="font-semibold mb-1 text-[color:var(--text)]">
                 Universidad Tecnológica Nacional
               </h3>
 
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm mt-1 text-[color:var(--muted)]">
                 Tecnicatura Superior en Programación
               </p>
 
@@ -698,29 +786,22 @@ function StackCard({ icon, title, items, nowrapTitle = false }) {
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.55, ease: "easeOut" }}
       className="
-        rounded-2xl border border-white/10
-        bg-white/[0.02]
+        rounded-2xl border border-[color:var(--border)]
+        bg-[var(--card)]
         p-7
         transition
-        hover:border-violet-500/35 hover:bg-white/[0.035]
+        hover:border-violet-500/35 hover:bg-black/5 dark:hover:bg-white/[0.035]
         hover:shadow-[0_0_0_1px_rgba(139,92,246,0.18)]
-        focus-within:ring-2 focus-within:ring-violet-500/40 focus-within:ring-offset-2 focus-within:ring-offset-[#0a0b10]
+        focus-within:ring-2 focus-within:ring-violet-500/40
+        focus-within:ring-offset-2 focus-within:ring-offset-[var(--bg2)]
         min-h-[220px]
       "
     >
-      <div
-        className="
-          inline-flex items-center gap-3
-          text-violet-400
-          mb-5
-        "
-      >
-        <span className="relative flex items-center justify-center">
-          {icon}
-        </span>
+      <div className="inline-flex items-center gap-3 text-violet-500 mb-5">
+        <span className="relative flex items-center justify-center">{icon}</span>
 
         <h3
-          className={`font-semibold text-white tracking-tight ${
+          className={`font-semibold tracking-tight text-[color:var(--text)] ${
             nowrapTitle ? "whitespace-nowrap" : ""
           }`}
         >
@@ -728,7 +809,7 @@ function StackCard({ icon, title, items, nowrapTitle = false }) {
         </h3>
       </div>
 
-      <ul className="space-y-2 text-sm text-slate-300 leading-relaxed">
+      <ul className="space-y-2 text-sm leading-relaxed text-[color:var(--muted)]">
         {items.map((item) => (
           <li key={item} className="flex gap-3">
             <span
@@ -743,13 +824,12 @@ function StackCard({ icon, title, items, nowrapTitle = false }) {
   );
 }
 
-
 /* ================= FOOTER ================= */
 function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-[#05060c] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20 border-t border-white/10"
+      className="bg-[var(--bg)] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20 border-t border-[color:var(--border)]"
       aria-labelledby="footer-title"
     >
       <Container className="flex justify-center">
@@ -766,12 +846,12 @@ function Footer() {
               <div className="min-w-0">
                 <h3
                   id="footer-title"
-                  className="text-3xl font-semibold text-white tracking-tight"
+                  className="text-3xl font-semibold tracking-tight text-[color:var(--text)]"
                 >
                   Nahuel Arriola
                 </h3>
 
-                <p className="text-base text-slate-400 mt-2 max-w-sm leading-relaxed">
+                <p className="text-base mt-2 max-w-sm leading-relaxed text-[color:var(--muted)]">
                   Construyendo sistemas pensados para durar.
                 </p>
               </div>
@@ -790,21 +870,25 @@ function Footer() {
                       href="https://www.linkedin.com/in/nahuel-arriola-6794b9355/"
                       label="LinkedIn"
                     >
-                      <FaLinkedinIn size={18} aria-hidden="true" focusable="false" />
+                      <FaLinkedinIn
+                        size={18}
+                        aria-hidden="true"
+                        focusable="false"
+                      />
                     </FooterLink>
                   </li>
 
                   <li>
-                    <FooterLink
-                      href="https://wa.me/543816439602"
-                      label="WhatsApp"
-                    >
+                    <FooterLink href="https://wa.me/543816439602" label="WhatsApp">
                       <FaWhatsapp size={18} aria-hidden="true" focusable="false" />
                     </FooterLink>
                   </li>
 
                   <li>
-                    <FooterLink href="mailto:nahuel.arriola777@gmail.com" label="Email">
+                    <FooterLink
+                      href="mailto:nahuel.arriola777@gmail.com"
+                      label="Email"
+                    >
                       <FaEnvelope size={18} aria-hidden="true" focusable="false" />
                     </FooterLink>
                   </li>
@@ -813,10 +897,10 @@ function Footer() {
             </div>
 
             {/* DIVIDER */}
-            <div className="mt-12 mb-5 h-px w-full bg-white/10" />
+            <div className="mt-12 mb-5 h-px w-full bg-[color:var(--border)]" />
 
             {/* Bottom */}
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <p className="text-sm leading-relaxed text-[color:var(--muted2)]">
               © 2026 Nahuel Arriola. Todos los derechos reservados.
             </p>
           </motion.div>
@@ -841,22 +925,25 @@ function FooterLink({ href, children, label }) {
         group inline-flex items-center gap-2
         rounded-full
         px-4 py-2
-        text-sm text-slate-300
-        border border-white/10
-        bg-white/[0.02]
+        text-sm
+        border border-[color:var(--border)]
+        bg-[var(--card)]
         transition
-        hover:text-white hover:border-violet-500/40 hover:bg-white/[0.04]
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#05060c]
+        hover:border-violet-500/40
+        hover:bg-black/5 dark:hover:bg-white/[0.04]
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70
+        focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]
         active:scale-[0.98]
+        text-[color:var(--muted)]
+        hover:text-[color:var(--text)]
       "
     >
       {/* ÍCONO */}
       <span
         className="
           relative
-          text-slate-400
           transition
-          group-hover:text-violet-400
+          group-hover:text-violet-500
           group-hover:drop-shadow-[0_0_10px_rgba(139,92,246,0.55)]
         "
       >
@@ -879,8 +966,9 @@ function FooterLink({ href, children, label }) {
       </span>
 
       {/* Aviso para lectores de pantalla cuando abre en nueva pestaña */}
-      {isExternal && <span className="sr-only">(se abre en una pestaña nueva)</span>}
+      {isExternal && (
+        <span className="sr-only">(se abre en una pestaña nueva)</span>
+      )}
     </a>
   );
 }
-
