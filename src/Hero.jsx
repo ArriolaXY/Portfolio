@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { FaGithub, FaLinkedinIn, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 /* ================= ANIMATIONS ================= */
 const fadeUp = {
@@ -90,7 +90,6 @@ export default function Home() {
   const isDark = theme === "dark";
 
   const themeVars = useMemo(() => {
-    // Podés ajustar estos colores si querés otro "light theme" más minimal
     return isDark
       ? {
           "--bg": "#05060c",
@@ -130,7 +129,7 @@ export default function Home() {
         isDark={isDark}
         onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
       />
-      <Hero />
+      <Hero isDark={isDark} />
       <PhilosophySection />
       <SectionDivider />
       <AboutSection />
@@ -145,18 +144,30 @@ export default function Home() {
 }
 
 /* ================= HERO ================= */
-function Hero() {
+function Hero({ isDark }) {
   return (
-    <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[var(--bg)] via-[var(--bg3)] to-[var(--bg)] pt-24 pb-16 sm:pt-28 sm:pb-20">
+    <section
+  className="
+    relative
+    min-h-[100svh]
+    flex items-center justify-center
+    overflow-hidden
+    bg-gradient-to-b
+    from-[var(--bg)]
+    via-[var(--bg3)]
+    to-[var(--bg)]
+    pt-32   /* navbar (64px) + aire */
+    pb-16
+  "
+>
       {/* Glow */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none" />
 
       {/* Graph background */}
-      <GraphBackground />
+      <GraphBackground isDark={isDark} />
 
       <Container className="relative z-20 flex justify-center">
         <div className="w-full max-w-4xl">
-          {/* Content */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -198,140 +209,254 @@ function Hero() {
         </div>
       </Container>
 
-      {/* CIERRE VISUAL DEL HERO */}
       <div className="absolute bottom-0 left-0 w-full border-t border-[color:var(--border)]" />
     </section>
   );
 }
 
-/* ================= GRAPH BACKGROUND ================= */
-function GraphBackground() {
-  const GRAPH_COUNT = 18;
+/* ================= GRAPH BACKGROUND (CONSTELLATION) ================= */
+function GraphBackground({ isDark }) {
+  const ref = useRef(null);
+  const [size, setSize] = useState({ w: 1200, h: 800 });
 
-  const graphs = useMemo(() => {
-    return Array.from({ length: GRAPH_COUNT }).map(() => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      scale: 0.22 + Math.random() * 0.28,
-    }));
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const el = ref.current;
+    const ro = new ResizeObserver(([entry]) => {
+      const cr = entry.contentRect;
+      setSize({ w: Math.max(300, cr.width), h: Math.max(300, cr.height) });
+    });
+
+    ro.observe(el);
+    return () => ro.disconnect();
   }, []);
 
+  // En light: más densidad para que se note
+  const DENSITY = isDark ? 0.000055 : 0.00007;
+  const count = Math.round(size.w * size.h * DENSITY);
+
+  const points = useMemo(() => {
+    const rand = (min, max) => min + Math.random() * (max - min);
+
+    return Array.from({ length: count }).map((_, i) => {
+      const x = Math.random() * size.w;
+      const y = Math.random() * size.h;
+
+      const r =
+        Math.random() < 0.82
+          ? rand(0.7, 1.35)
+          : Math.random() < 0.9
+          ? rand(1.35, 2.1)
+          : rand(2.1, 2.9);
+
+      // En light: subimos opacidad para que no quede lavado
+      const a = isDark
+        ? Math.random() < 0.85
+          ? rand(0.12, 0.28)
+          : rand(0.28, 0.55)
+        : Math.random() < 0.82
+        ? rand(0.18, 0.38)
+        : rand(0.38, 0.68);
+
+      const glow = Math.random() < (isDark ? 0.14 : 0.18);
+
+      const tw = rand(2.8, 6.5);
+      const delay = rand(0, 3.5);
+
+      return { id: i, x, y, r, a, glow, tw, delay };
+    });
+  }, [count, size.w, size.h, isDark]);
+
+  const links = useMemo(() => {
+    const maxDist = Math.min(size.w, size.h) * (isDark ? 0.12 : 0.13);
+    const maxDist2 = maxDist * maxDist;
+
+    const out = [];
+    const pickCandidates = 14;
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+
+      const targetLinks =
+        Math.random() < 0.65 ? 1 : Math.random() < 0.35 ? 0 : 2;
+
+      let made = 0;
+      for (let k = 0; k < pickCandidates && made < targetLinks; k++) {
+        const j = Math.floor(Math.random() * points.length);
+        if (j === i) continue;
+
+        const q = points[j];
+        const dx = p.x - q.x;
+        const dy = p.y - q.y;
+        const d2 = dx * dx + dy * dy;
+
+        if (d2 < maxDist2) {
+          const base = isDark
+            ? 0.06 + (1 - d2 / maxDist2) * 0.12
+            : 0.1 + (1 - d2 / maxDist2) * 0.18;
+
+          const a =
+            p.glow && q.glow
+              ? isDark
+                ? Math.min(0.26, base + 0.1)
+                : Math.min(0.42, base + 0.16)
+              : base;
+
+          out.push({
+            id: `${i}-${j}-${k}`,
+            x1: p.x,
+            y1: p.y,
+            x2: q.x,
+            y2: q.y,
+            a,
+          });
+          made++;
+        }
+      }
+    }
+
+    return out;
+  }, [points, size.w, size.h, isDark]);
+
   return (
-    <svg
-      className="absolute inset-0 z-0 w-full h-full pointer-events-none"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      <defs>
-        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-          <path
-            d="M 10 0 L 0 0 0 10"
-            fill="none"
-            stroke="var(--grid)"
-            strokeWidth="0.2"
-          />
-        </pattern>
-      </defs>
+    <div ref={ref} className="absolute inset-0 z-0 pointer-events-none">
+      <svg
+        className="w-full h-full"
+        viewBox={`0 0 ${size.w} ${size.h}`}
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <filter id="violetGlow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="2.4" result="blur" />
+            <feColorMatrix
+              in="blur"
+              type="matrix"
+              values="
+                1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.65 0"
+              result="colored"
+            />
+            <feMerge>
+              <feMergeNode in="colored" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
 
-      {/* grid */}
-      <rect width="100" height="100" fill="url(#grid)" />
+          <linearGradient id="linkGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop
+              offset="0%"
+              stopColor={
+                isDark
+                  ? "rgba(139,92,246,0.00)"
+                  : "rgba(109,40,217,0.00)"
+              }
+            />
+            <stop
+              offset="35%"
+              stopColor={
+                isDark
+                  ? "rgba(139,92,246,0.55)"
+                  : "rgba(109,40,217,0.65)"
+              }
+            />
+            <stop
+              offset="65%"
+              stopColor={
+                isDark
+                  ? "rgba(139,92,246,0.55)"
+                  : "rgba(109,40,217,0.65)"
+              }
+            />
+            <stop
+              offset="100%"
+              stopColor={
+                isDark
+                  ? "rgba(139,92,246,0.00)"
+                  : "rgba(109,40,217,0.00)"
+              }
+            />
+          </linearGradient>
 
-      {/* mini graphs */}
-      {graphs.map((g, i) => (
-        <MiniGraph
-          key={i}
-          offsetX={g.x}
-          offsetY={g.y}
-          scale={g.scale}
-          index={i}
+          <radialGradient id="softFog" cx="50%" cy="35%" r="70%">
+            <stop
+              offset="0%"
+              stopColor={
+                isDark
+                  ? "rgba(139,92,246,0.08)"
+                  : "rgba(109,40,217,0.10)"
+              }
+            />
+            <stop
+              offset="55%"
+              stopColor={
+                isDark
+                  ? "rgba(139,92,246,0.02)"
+                  : "rgba(109,40,217,0.04)"
+              }
+            />
+            <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+          </radialGradient>
+        </defs>
+
+        <rect
+          width={size.w}
+          height={size.h}
+          fill="url(#softFog)"
+          opacity={isDark ? 0.8 : 0.95}
         />
-      ))}
-    </svg>
-  );
-}
 
-function MiniGraph({ offsetX, offsetY, scale, index }) {
-  const layers = {
-    edge: [
-      { id: "e1", x: 10, y: 18 },
-      { id: "e2", x: 28, y: 16 },
-      { id: "e3", x: 72, y: 18 },
-      { id: "e4", x: 90, y: 16 },
-    ],
-    services: [
-      { id: "s1", x: 14, y: 48 },
-      { id: "s2", x: 80, y: 48 },
-      { id: "s3", x: 75, y: 45 },
-    ],
-    core: [
-      { id: "c1", x: 38, y: 78 },
-      { id: "c2", x: 62, y: 78 },
-    ],
-  };
+        <g opacity="0.95">
+          {links.map((l) => (
+            <line
+              key={l.id}
+              x1={l.x1}
+              y1={l.y1}
+              x2={l.x2}
+              y2={l.y2}
+              stroke="url(#linkGrad)"
+              strokeWidth={isDark ? 1 : 1.15}
+              opacity={l.a}
+              strokeLinecap="round"
+            />
+          ))}
+        </g>
 
-  const links = [
-    ["e1", "s1"],
-    ["e2", "s1"],
-    ["e3", "s2"],
-    ["e4", "s3"],
-    ["s1", "c1"],
-    ["s2", "c2"],
-    ["s3", "c2"],
-    ["c1", "c2"],
-  ];
+        <g>
+          {points.map((p) => (
+            <circle
+              key={p.id}
+              cx={p.x}
+              cy={p.y}
+              r={p.r}
+              fill={
+                isDark
+                  ? p.glow
+                    ? "rgba(167,139,250,0.95)"
+                    : "rgba(167,139,250,0.85)"
+                  : p.glow
+                  ? "rgba(109,40,217,0.95)"
+                  : "rgba(109,40,217,0.85)"
+              }
+              opacity={p.a}
+              filter={p.glow ? "url(#violetGlow)" : undefined}
+              style={{
+                animation: `twinkle ${p.tw}s ease-in-out ${p.delay}s infinite`,
+              }}
+            />
+          ))}
+        </g>
+      </svg>
 
-  const allNodes = Object.values(layers).flat();
-  const getNode = (id) => allNodes.find((n) => n.id === id);
-
-  return (
-    <g
-  transform={`translate(${offsetX} ${offsetY}) scale(${scale})`}
-  opacity={0.2}
->
-      {/* links */}
-      {links.map(([a, b], i) => {
-        const from = getNode(a);
-        const to = getNode(b);
-        const isCore = a.startsWith("c") && b.startsWith("c");
-
-        return (
-          <motion.line
-            key={i}
-            x1={from.x}
-            y1={from.y}
-            x2={to.x}
-            y2={to.y}
-            stroke={
-  isCore
-    ? "rgba(139,92,246,0.22)"
-    : "rgba(139,92,246,0.12)"
-}
-strokeWidth={isCore ? 0.45 : 0.3}
-            strokeLinecap="round"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: index * 0.05, duration: 0.6 }}
-          />
-        );
-      })}
-
-      {/* nodes */}
-      {allNodes.map((n) => {
-        const isCore = n.id.startsWith("c");
-        const isService = n.id.startsWith("s");
-
-        return (
-          <circle
-            key={n.id}
-            cx={n.x}
-            cy={n.y}
-            r={isCore ? 0.9 : isService ? 0.7 : 0.55}
-            fill="#a78bfa"
-            opacity={0.7}
-          />
-        );
-      })}
-    </g>
+      <style>{`
+        @keyframes twinkle {
+          0%, 100% { opacity: var(--twA, 1); transform: translateZ(0); }
+          50% { opacity: calc(var(--twA, 1) * 0.45); }
+        }
+      `}</style>
+    </div>
   );
 }
 
@@ -347,9 +472,31 @@ function Navbar({ isDark, onToggleTheme }) {
   const handleClick = (e, href) => smoothScrollToHash(e, href);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[color:var(--bg)]/80 border-b border-[color:var(--border)]">
-      <nav className="h-16">
+    <header className="fixed top-0 left-0 w-full z-50">
+      {/* GLASS BASE (dark + light) */}
+      <div
+        className="
+          absolute inset-0
+          backdrop-blur-md
+          border-b border-[color:var(--border)]
+          bg-[color:var(--bg)]/80
+          dark:bg-[color:var(--bg)]/70
+        "
+      />
+
+      {/* VIOLET TINT (muy sutil, deja pasar el Hero real) */}
+      <div
+        className="
+          absolute inset-0 pointer-events-none
+          bg-gradient-to-b
+          from-violet-600/10 via-transparent to-transparent
+          dark:from-violet-500/10
+        "
+      />
+
+      <nav className="relative h-16">
         <Container className="h-full flex items-center justify-between">
+          {/* LOGO */}
           <a
             href="#top"
             onClick={(e) => {
@@ -357,29 +504,49 @@ function Navbar({ isDark, onToggleTheme }) {
               window.scrollTo({ top: 0, behavior: "smooth" });
               history.pushState(null, "", "#top");
             }}
-            className="text-lg font-semibold tracking-tight cursor-pointer transition-all duration-300 hover:text-violet-500 text-[color:var(--text)]"
+            className="
+              text-lg font-semibold tracking-tight cursor-pointer
+              transition-colors duration-300
+              hover:text-violet-500
+              text-[color:var(--text)]
+            "
           >
             Nahuel Arriola
           </a>
 
           <div className="flex items-center gap-3">
+            {/* LINKS */}
             <ul className="hidden md:flex gap-8 text-sm text-[color:var(--muted)]">
               {links.map((item) => (
                 <li key={item.href} className="group relative">
                   <a
                     href={item.href}
                     onClick={(e) => handleClick(e, item.href)}
-                    className="hover:text-[color:var(--text)] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 rounded"
+                    className="
+                      hover:text-[color:var(--text)]
+                      transition
+                      focus:outline-none
+                      focus-visible:ring-2
+                      focus-visible:ring-violet-500/70
+                      rounded
+                    "
                   >
                     {item.label}
                   </a>
 
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-violet-500 transition-all duration-300 group-hover:w-full" />
+                  <span
+                    className="
+                      absolute -bottom-1 left-0 w-0 h-px
+                      bg-violet-500
+                      transition-all duration-300
+                      group-hover:w-full
+                    "
+                  />
                 </li>
               ))}
             </ul>
 
-            {/* Theme Toggle (icon only, no border) */}
+            {/* THEME TOGGLE */}
             <button
               type="button"
               onClick={onToggleTheme}
@@ -388,19 +555,21 @@ function Navbar({ isDark, onToggleTheme }) {
               }
               className="
                 inline-flex items-center justify-center
-                p-2
-                rounded-md
+                p-2 rounded-md
                 text-[color:var(--muted)]
                 hover:text-[color:var(--text)]
-                hover:bg-black/5 dark:hover:bg-white/5
+                hover:bg-black/5
+                dark:hover:bg-white/5
                 transition
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70
+                focus:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-violet-500/70
               "
             >
               {isDark ? (
-                <Sun size={18} aria-hidden="true" focusable="false" />
+                <Sun size={18} aria-hidden="true" />
               ) : (
-                <Moon size={18} aria-hidden="true" focusable="false" />
+                <Moon size={18} aria-hidden="true" />
               )}
             </button>
           </div>
@@ -421,7 +590,6 @@ function PhilosophySection() {
       <Container className="flex justify-center">
         <Content>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-14 md:gap-16 items-start">
-            {/* Left */}
             <header>
               <h2
                 id="philosophy-title"
@@ -432,7 +600,6 @@ function PhilosophySection() {
               <div className="mt-3 h-[3px] w-12 bg-violet-500" />
             </header>
 
-            {/* Right */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -476,7 +643,6 @@ function AboutSection() {
       <Container className="flex justify-center">
         <Content>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-14 md:gap-16 items-start">
-            {/* Left */}
             <header>
               <h2
                 id="about-title"
@@ -487,7 +653,6 @@ function AboutSection() {
               <div className="mt-3 h-[3px] w-12 bg-violet-500" />
             </header>
 
-            {/* Right */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -539,7 +704,6 @@ function Projects() {
     >
       <Container className="flex justify-center">
         <Content>
-          {/* Title */}
           <header className="mb-14">
             <h2
               id="projects-title"
@@ -550,7 +714,6 @@ function Projects() {
             <div className="mt-3 h-[3px] w-12 bg-violet-500" />
           </header>
 
-          {/* Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10">
             <ProjectCard
               title="Gestión Contable Ampuero"
@@ -586,7 +749,6 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
       "
       aria-labelledby={`${title}-title`}
     >
-      {/* Subtle glow overlay */}
       <div
         aria-hidden="true"
         className="
@@ -598,7 +760,6 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
       />
 
       <div className="relative p-6 sm:p-8">
-        {/* Header */}
         <div className="flex items-start justify-between gap-6 mb-6">
           <h3
             id={`${title}-title`}
@@ -627,7 +788,6 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
           </span>
         </div>
 
-        {/* Content */}
         <div className="space-y-6 text-sm leading-relaxed">
           <ProjectBlock label="EL PROBLEMA">{problem}</ProjectBlock>
           <ProjectBlock label="LA SOLUCIÓN">{solution}</ProjectBlock>
@@ -637,7 +797,6 @@ function ProjectCard({ title, problem, solution, decisions, result, tech }) {
           </ProjectBlock>
         </div>
 
-        {/* Tech stack */}
         <div className="flex flex-wrap gap-2 mt-8">
           {tech.map((t) => (
             <span
@@ -688,7 +847,6 @@ function StackTecnico() {
     >
       <Container className="flex justify-center">
         <Content>
-          {/* TÍTULO */}
           <header className="mb-14">
             <h2
               id="stack-title"
@@ -699,30 +857,25 @@ function StackTecnico() {
             <div className="mt-3 h-[3px] w-12 bg-violet-500" />
           </header>
 
-          {/* GRID STACK */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-            {/* FRONTEND */}
             <StackCard
               icon={<Monitor size={20} aria-hidden="true" focusable="false" />}
               title="Frontend"
               items={["JavaScript / TypeScript", "Angular", "React", "Next.js"]}
             />
 
-            {/* BACKEND */}
             <StackCard
               icon={<Server size={20} aria-hidden="true" focusable="false" />}
               title="Backend"
               items={[".NET (ASP.NET)", "MySQL", "PostgreSQL"]}
             />
 
-            {/* CLOUD */}
             <StackCard
               icon={<Cloud size={20} aria-hidden="true" focusable="false" />}
               title="Cloud & DevOps"
               items={["Docker", "Google Cloud Platform"]}
             />
 
-            {/* DESARROLLO DE SOFTWARE */}
             <StackCard
               icon={<Wrench size={20} aria-hidden="true" focusable="false" />}
               title="Desarrollo de Software"
@@ -735,10 +888,8 @@ function StackTecnico() {
             />
           </div>
 
-          {/* DIVIDER */}
           <div className="my-20 h-px w-full bg-[color:var(--border)]" />
 
-          {/* EDUCACIÓN */}
           <section aria-labelledby="education-title">
             <header className="mb-10">
               <h2
@@ -840,9 +991,7 @@ function Footer() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: "easeOut" }}
           >
-            {/* Top */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-10">
-              {/* Left */}
               <div className="min-w-0">
                 <h3
                   id="footer-title"
@@ -856,11 +1005,13 @@ function Footer() {
                 </p>
               </div>
 
-              {/* Right */}
               <nav aria-label="Enlaces de contacto" className="w-full md:w-auto">
                 <ul className="flex flex-wrap items-center gap-3 md:gap-4">
                   <li>
-                    <FooterLink href="https://github.com/ArriolaXY" label="GitHub">
+                    <FooterLink
+                      href="https://github.com/ArriolaXY"
+                      label="GitHub"
+                    >
                       <FaGithub size={18} aria-hidden="true" focusable="false" />
                     </FooterLink>
                   </li>
@@ -879,8 +1030,15 @@ function Footer() {
                   </li>
 
                   <li>
-                    <FooterLink href="https://wa.me/543816439602" label="WhatsApp">
-                      <FaWhatsapp size={18} aria-hidden="true" focusable="false" />
+                    <FooterLink
+                      href="https://wa.me/543816439602"
+                      label="WhatsApp"
+                    >
+                      <FaWhatsapp
+                        size={18}
+                        aria-hidden="true"
+                        focusable="false"
+                      />
                     </FooterLink>
                   </li>
 
@@ -889,17 +1047,19 @@ function Footer() {
                       href="mailto:nahuel.arriola777@gmail.com"
                       label="Email"
                     >
-                      <FaEnvelope size={18} aria-hidden="true" focusable="false" />
+                      <FaEnvelope
+                        size={18}
+                        aria-hidden="true"
+                        focusable="false"
+                      />
                     </FooterLink>
                   </li>
                 </ul>
               </nav>
             </div>
 
-            {/* DIVIDER */}
             <div className="mt-12 mb-5 h-px w-full bg-[color:var(--border)]" />
 
-            {/* Bottom */}
             <p className="text-sm leading-relaxed text-[color:var(--muted2)]">
               © 2026 Nahuel Arriola. Todos los derechos reservados.
             </p>
@@ -938,7 +1098,6 @@ function FooterLink({ href, children, label }) {
         hover:text-[color:var(--text)]
       "
     >
-      {/* ÍCONO */}
       <span
         className="
           relative
@@ -950,10 +1109,8 @@ function FooterLink({ href, children, label }) {
         {children}
       </span>
 
-      {/* TEXTO */}
       <span className="tracking-tight relative">
         {label}
-        {/* underline accesible */}
         <span
           aria-hidden="true"
           className="
@@ -965,10 +1122,7 @@ function FooterLink({ href, children, label }) {
         />
       </span>
 
-      {/* Aviso para lectores de pantalla cuando abre en nueva pestaña */}
-      {isExternal && (
-        <span className="sr-only">(se abre en una pestaña nueva)</span>
-      )}
+      {isExternal && <span className="sr-only">(se abre en una pestaña nueva)</span>}
     </a>
   );
 }
