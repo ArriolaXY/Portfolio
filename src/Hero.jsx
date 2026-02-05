@@ -189,22 +189,73 @@ function Hero({ isDark }) {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <a
-                href="#projects"
-                onClick={(e) => smoothScrollToHash(e, "#projects")}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-md bg-violet-600 text-white font-medium hover:bg-violet-500 transition shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-              >
-                Ver proyectos
-              </a>
+  {/* CTA: Ver proyectos (más “luz”) */}
+  <a
+    href="#projects"
+    onClick={(e) => smoothScrollToHash(e, "#projects")}
+    className="
+      relative isolate
+      w-full sm:w-auto text-center
+      px-6 py-3 rounded-md
+      font-medium text-white
+      bg-violet-600
+      transition
+      shadow-[0_0_0_1px_rgba(139,92,246,0.35),0_18px_45px_rgba(139,92,246,0.22)]
+      hover:bg-violet-500
+      hover:shadow-[0_0_0_1px_rgba(139,92,246,0.45),0_22px_60px_rgba(139,92,246,0.30)]
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]
+      active:scale-[0.98]
+    "
+  >
+    {/* Halo / glow */}
+    <span
+      aria-hidden="true"
+      className="
+        pointer-events-none absolute -inset-1 -z-10
+        rounded-lg
+        bg-gradient-to-r from-violet-500/35 via-fuchsia-500/20 to-violet-500/35
+        blur-xl
+        opacity-70
+        transition-opacity duration-300
+        group-hover:opacity-100
+      "
+    />
+    {/* Shine */}
+    <span
+      aria-hidden="true"
+      className="
+        pointer-events-none absolute inset-0 -z-10
+        rounded-md
+        bg-[radial-gradient(120px_60px_at_30%_20%,rgba(255,255,255,0.28),transparent_60%)]
+        opacity-80
+      "
+    />
+    Ver proyectos
+  </a>
 
-              <a
-                href="#contact"
-                onClick={(e) => smoothScrollToHash(e, "#contact")}
-                className="w-full sm:w-auto text-center px-6 py-3 rounded-md border border-[color:var(--border)] text-[color:var(--text)] hover:bg-black/5 dark:hover:bg-white/5 transition"
-              >
-                Contacto
-              </a>
-            </div>
+  {/* CTA: Contacto (hover más notorio en light) */}
+  <a
+    href="#contact"
+    onClick={(e) => smoothScrollToHash(e, "#contact")}
+    className="
+      w-full sm:w-auto text-center
+      px-6 py-3 rounded-md
+      border border-[color:var(--border)]
+      text-[color:var(--text)]
+      transition
+      bg-transparent
+      hover:bg-violet-600/10
+      hover:border-violet-500/45
+      hover:shadow-[0_0_0_1px_rgba(139,92,246,0.18)]
+      dark:hover:bg-white/5
+      dark:hover:border-violet-500/30
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]
+      active:scale-[0.98]
+    "
+  >
+    Contacto
+  </a>
+</div>
           </motion.div>
         </div>
       </Container>
