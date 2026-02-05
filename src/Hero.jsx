@@ -130,7 +130,6 @@ export default function Home() {
         onToggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
       />
       <Hero isDark={isDark} />
-      <PhilosophySection />
       <SectionDivider />
       <AboutSection />
       <SectionDivider />
@@ -179,8 +178,7 @@ function Hero({ isDark }) {
             </span>
 
             <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-tight text-[color:var(--text)]">
-              Construyo aplicaciones escalables, mantenibles y orientadas a
-              resultados.
+              Convierto ideas en herramientas digitales.
             </h1>
 
             <p className="mt-6 max-w-xl leading-relaxed text-[15px] sm:text-[16px] text-[color:var(--muted)]">
@@ -514,7 +512,6 @@ function GraphBackground({ isDark }) {
 /* ================= NAVBAR ================= */
 function Navbar({ isDark, onToggleTheme }) {
   const links = [
-    { label: "Filosofía", href: "#philosophy" },
     { label: "Sobre mí", href: "#about" },
     { label: "Proyectos", href: "#projects" },
     { label: "Contacto", href: "#contact" },
@@ -630,58 +627,7 @@ function Navbar({ isDark, onToggleTheme }) {
   );
 }
 
-/* ================= PHILOSOPHY ================= */
-function PhilosophySection() {
-  return (
-    <section
-      id="philosophy"
-      aria-labelledby="philosophy-title"
-      className="bg-[var(--bg)] pt-14 pb-14 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20"
-    >
-      <Container className="flex justify-center">
-        <Content>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-14 md:gap-16 items-start">
-            <header>
-              <h2
-                id="philosophy-title"
-                className="text-3xl font-semibold text-[color:var(--text)]"
-              >
-                Filosofía
-              </h2>
-              <div className="mt-3 h-[3px] w-12 bg-violet-500" />
-            </header>
 
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.55, ease: "easeOut" }}
-              className="min-w-0"
-            >
-              <blockquote className="relative text-3xl leading-tight font-medium text-[color:var(--text)]">
-                “Un buen desarrollo no se nota solo al lanzar, sino con el paso
-                del tiempo.”
-              </blockquote>
-
-              <p className="mt-8 leading-relaxed text-[17px] text-[color:var(--muted)]">
-                Como Desarrollador web Full Stack, creo aplicaciones web
-                modernas, rápidas y seguras, pensadas para crecer junto a tu
-                proyecto. Desarrollo tanto el frontend como el backend con foco
-                en rendimiento, escalabilidad y facilidad de mantenimiento.
-                <br />
-                <br />
-                Mi prioridad es entregar soluciones claras, eficientes y
-                confiables, eligiendo siempre la tecnología adecuada para cada
-                necesidad, sin sobrecomplicar. El objetivo: que tu sistema
-                funcione bien hoy y siga funcionando mañana.
-              </p>
-            </motion.div>
-          </div>
-        </Content>
-      </Container>
-    </section>
-  );
-}
 
 /* ================= ABOUT ================= */
 function AboutSection() {
@@ -712,30 +658,15 @@ function AboutSection() {
               className="space-y-6 leading-relaxed text-[17px] min-w-0 text-[color:var(--muted)]"
             >
               <p>
-                Soy Desarrollador web Full Stack y me dedico a crear aplicaciones
-                web funcionales, claras y pensadas para crecer. Trabajo tanto en
-                el frontend como en el backend, enfocándome en que cada parte
-                del sistema sea entendible, mantenible y útil para el negocio.
+                Soy programador Full Stack enfocado en desarrollo web y egresado de la Universidad Tecnológica Nacional (UTN). Me especializo en crear soluciones digitales pensadas para resolver problemas reales, priorizando siempre la simplicidad, la claridad y la utilidad.
               </p>
 
               <p>
-                Me gusta encarar los proyectos desde el pensamiento técnico,
-                entendiendo el problema antes de escribir código. No busco
-                complicar con herramientas innecesarias, sino elegir las
-                tecnologías adecuadas para cada caso y construir soluciones
-                sólidas.
+                Creo firmemente que el buen software no solo debe funcionar, sino también entenderse. Cada línea de código que escribo tiene un propósito concreto: aportar valor desde el primer uso, facilitar la experiencia del usuario y mantenerse clara y sostenible en el tiempo.
               </p>
 
               <p>
-                Como desarrollador junior, tengo una mentalidad de aprendizaje
-                constante, buena capacidad de adaptación y un fuerte compromiso
-                con hacer las cosas bien desde la base.
-              </p>
-
-              <p>
-                Si estás buscando a alguien que programe con criterio,
-                responsabilidad y ganas de crecer junto a tu proyecto, estoy
-                listo para aportar.
+                Disfruto trabajar en proyectos donde la tecnología es una herramienta para mejorar procesos, optimizar tiempos y brindar soluciones prácticas. Me siento cómodo tanto en el frontend como en el backend, y valoro el código limpio, bien estructurado y orientado a resultados.
               </p>
             </motion.div>
           </div>
