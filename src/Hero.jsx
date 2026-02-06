@@ -1000,7 +1000,7 @@ function Footer() {
 
                   <li>
                     <FooterLink
-                      href="https://www.linkedin.com/in/nahuel-arriola-6794b9355/"
+                      href="https://www.linkedin.com/in/nahuel-arriola/"
                       label="LinkedIn"
                     >
                       <FaLinkedinIn
