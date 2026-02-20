@@ -11,12 +11,21 @@ import { FaGithub, FaLinkedinIn, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState, useRef } from "react";
 
-/* ================= ANIMATIONS ================= */
+/**
+ * Variants de animación para Framer Motion.
+ * Se utiliza para entradas suaves (fade + desplazamiento vertical).
+ */
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
 
+/**
+ * Separador visual horizontal entre secciones.
+ * Mantiene continuidad estética y refuerzo de jerarquía visual.
+ *
+ * @returns {JSX.Element}
+ */
 function SectionDivider() {
   return (
     <div className="relative">
@@ -26,7 +35,14 @@ function SectionDivider() {
   );
 }
 
-/* ================= CONTAINER ================= */
+/**
+ * Contenedor responsivo para centrar contenido y limitar ancho máximo.
+ *
+ * @param {object} props
+ * @param {*} props.children Contenido interno.
+ * @param {string} [props.className] Clases extra para el contenedor.
+ * @returns {JSX.Element}
+ */
 function Container({ children, className = "" }) {
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
@@ -35,12 +51,30 @@ function Container({ children, className = "" }) {
   );
 }
 
+/**
+ * Wrapper de contenido para limitar el ancho interno en secciones.
+ *
+ * @param {object} props
+ * @param {*} props.children Contenido interno.
+ * @returns {JSX.Element}
+ */
 function Content({ children }) {
   return <div className="w-full max-w-4xl">{children}</div>;
 }
 
+/**
+ * Offset aplicado al scroll suave para compensar la altura del navbar fijo.
+ */
 const NAVBAR_OFFSET = 64;
 
+/**
+ * Scroll suave hacia un hash (#id) compensando el navbar fijo.
+ * Actualiza el historial para reflejar el hash navegable.
+ *
+ * @param {Event} e Evento del click.
+ * @param {string} href Hash a navegar (ej: "#projects").
+ * @param {number} [offset] Offset superior para compensar el navbar.
+ */
 function smoothScrollToHash(e, href, offset = NAVBAR_OFFSET) {
   e.preventDefault();
 
@@ -53,28 +87,44 @@ function smoothScrollToHash(e, href, offset = NAVBAR_OFFSET) {
   history.pushState(null, "", href);
 }
 
-/* ================= THEME HELPERS ================= */
+/**
+ * Clave de almacenamiento para persistir el tema en localStorage.
+ */
 const THEME_KEY = "na_theme";
 
+/**
+ * Obtiene el tema inicial:
+ * - Si existe tema guardado (dark/light) lo respeta.
+ * - Si no existe, usa dark por defecto.
+ *
+ * @returns {"dark"|"light"}
+ */
 function getInitialTheme() {
   if (typeof window === "undefined") return "dark";
 
   const saved = window.localStorage.getItem(THEME_KEY);
   if (saved === "dark" || saved === "light") return saved;
 
-  const prefersDark =
-    window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-  return prefersDark ? "dark" : "light";
+  return "dark";
 }
 
+/**
+ * Aplica el tema al documento agregando/removiendo la clase "dark"
+ * en el elemento raíz (html).
+ *
+ * @param {"dark"|"light"} theme
+ */
 function applyThemeToDocument(theme) {
   if (typeof document === "undefined") return;
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
-/* ================= PAGE ================= */
+/**
+ * Página principal del portfolio.
+ * Orquesta el tema, variables CSS y estructura de secciones.
+ *
+ * @returns {JSX.Element}
+ */
 export default function Home() {
   const [theme, setTheme] = useState(getInitialTheme);
 
@@ -82,13 +132,15 @@ export default function Home() {
     applyThemeToDocument(theme);
     try {
       window.localStorage.setItem(THEME_KEY, theme);
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [theme]);
 
   const isDark = theme === "dark";
 
+  /**
+   * Variables CSS (custom properties) usadas por Tailwind vía var(--x).
+   * Se recalculan solo cuando cambia el tema.
+   */
   const themeVars = useMemo(() => {
     return isDark
       ? {
@@ -96,9 +148,9 @@ export default function Home() {
           "--bg2": "#0a0b10",
           "--bg3": "#090b18",
           "--card": "rgba(255,255,255,0.02)",
-          "--text": "rgb(248 250 252)", // slate-50
-          "--muted": "rgb(148 163 184)", // slate-400
-          "--muted2": "rgb(100 116 139)", // slate-500
+          "--text": "rgb(248 250 252)",
+          "--muted": "rgb(148 163 184)",
+          "--muted2": "rgb(100 116 139)",
           "--border": "rgba(255,255,255,0.10)",
           "--grid": "rgba(255,255,255,0.03)",
         }
@@ -107,9 +159,9 @@ export default function Home() {
           "--bg2": "#ffffff",
           "--bg3": "#eef2ff",
           "--card": "rgba(2,6,23,0.03)",
-          "--text": "rgb(15 23 42)", // slate-900
-          "--muted": "rgb(51 65 85)", // slate-700
-          "--muted2": "rgb(71 85 105)", // slate-600
+          "--text": "rgb(15 23 42)",
+          "--muted": "rgb(51 65 85)",
+          "--muted2": "rgb(71 85 105)",
           "--border": "rgba(2,6,23,0.10)",
           "--grid": "rgba(2,6,23,0.05)",
         };
@@ -142,11 +194,18 @@ export default function Home() {
   );
 }
 
-/* ================= HERO ================= */
+/**
+ * Sección Hero: presentación principal con fondo animado tipo constelación,
+ * CTA a proyectos y contacto, y encabezado principal.
+ *
+ * @param {object} props
+ * @param {boolean} props.isDark Indica si el tema actual es oscuro.
+ * @returns {JSX.Element}
+ */
 function Hero({ isDark }) {
   return (
     <section
-  className="
+      className="
     relative
     min-h-[100svh]
     flex items-center justify-center
@@ -155,14 +214,12 @@ function Hero({ isDark }) {
     from-[var(--bg)]
     via-[var(--bg3)]
     to-[var(--bg)]
-    pt-32   /* navbar (64px) + aire */
+    pt-32
     pb-16
   "
->
-      {/* Glow */}
+    >
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none" />
 
-      {/* Graph background */}
       <GraphBackground isDark={isDark} />
 
       <Container className="relative z-20 flex justify-center">
@@ -187,11 +244,10 @@ function Hero({ isDark }) {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-  {/* CTA: Ver proyectos (más “luz”) */}
-  <a
-    href="#projects"
-    onClick={(e) => smoothScrollToHash(e, "#projects")}
-    className="
+              <a
+                href="#projects"
+                onClick={(e) => smoothScrollToHash(e, "#projects")}
+                className="
       relative isolate
       w-full sm:w-auto text-center
       px-6 py-3 rounded-md
@@ -204,11 +260,10 @@ function Hero({ isDark }) {
       focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]
       active:scale-[0.98]
     "
-  >
-    {/* Halo / glow */}
-    <span
-      aria-hidden="true"
-      className="
+              >
+                <span
+                  aria-hidden="true"
+                  className="
         pointer-events-none absolute -inset-1 -z-10
         rounded-lg
         bg-gradient-to-r from-violet-500/35 via-fuchsia-500/20 to-violet-500/35
@@ -217,25 +272,23 @@ function Hero({ isDark }) {
         transition-opacity duration-300
         group-hover:opacity-100
       "
-    />
-    {/* Shine */}
-    <span
-      aria-hidden="true"
-      className="
+                />
+                <span
+                  aria-hidden="true"
+                  className="
         pointer-events-none absolute inset-0 -z-10
         rounded-md
         bg-[radial-gradient(120px_60px_at_30%_20%,rgba(255,255,255,0.28),transparent_60%)]
         opacity-80
       "
-    />
-    Ver proyectos
-  </a>
+                />
+                Ver proyectos
+              </a>
 
-  {/* CTA: Contacto (hover más notorio en light) */}
-  <a
-    href="#contact"
-    onClick={(e) => smoothScrollToHash(e, "#contact")}
-    className="
+              <a
+                href="#contact"
+                onClick={(e) => smoothScrollToHash(e, "#contact")}
+                className="
       w-full sm:w-auto text-center
       px-6 py-3 rounded-md
       border border-[color:var(--border)]
@@ -250,10 +303,10 @@ function Hero({ isDark }) {
       focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]
       active:scale-[0.98]
     "
-  >
-    Contacto
-  </a>
-</div>
+              >
+                Contacto
+              </a>
+            </div>
           </motion.div>
         </div>
       </Container>
@@ -263,7 +316,16 @@ function Hero({ isDark }) {
   );
 }
 
-/* ================= GRAPH BACKGROUND (CONSTELLATION) ================= */
+/**
+ * Fondo SVG tipo constelación:
+ * - Genera puntos y enlaces según el tamaño del contenedor.
+ * - Ajusta densidad/opacidad según el tema.
+ * - Reacciona al resize mediante ResizeObserver.
+ *
+ * @param {object} props
+ * @param {boolean} props.isDark Indica si el tema actual es oscuro.
+ * @returns {JSX.Element}
+ */
 function GraphBackground({ isDark }) {
   const ref = useRef(null);
   const [size, setSize] = useState({ w: 1200, h: 800 });
@@ -281,7 +343,6 @@ function GraphBackground({ isDark }) {
     return () => ro.disconnect();
   }, []);
 
-  // En light: más densidad para que se note
   const DENSITY = isDark ? 0.000055 : 0.00007;
   const count = Math.round(size.w * size.h * DENSITY);
 
@@ -299,7 +360,6 @@ function GraphBackground({ isDark }) {
           ? rand(1.35, 2.1)
           : rand(2.1, 2.9);
 
-      // En light: subimos opacidad para que no quede lavado
       const a = isDark
         ? Math.random() < 0.85
           ? rand(0.12, 0.28)
@@ -509,7 +569,17 @@ function GraphBackground({ isDark }) {
   );
 }
 
-/* ================= NAVBAR ================= */
+/**
+ * Navbar fijo superior:
+ * - Estilo glass + tinte violeta.
+ * - Links con scroll suave a secciones.
+ * - Toggle de tema dark/light.
+ *
+ * @param {object} props
+ * @param {boolean} props.isDark Indica si el tema actual es oscuro.
+ * @param {Function} props.onToggleTheme Handler para alternar tema.
+ * @returns {JSX.Element}
+ */
 function Navbar({ isDark, onToggleTheme }) {
   const links = [
     { label: "Sobre mí", href: "#about" },
@@ -521,7 +591,6 @@ function Navbar({ isDark, onToggleTheme }) {
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
-      {/* GLASS BASE (dark + light) */}
       <div
         className="
           absolute inset-0
@@ -532,7 +601,6 @@ function Navbar({ isDark, onToggleTheme }) {
         "
       />
 
-      {/* VIOLET TINT (muy sutil, deja pasar el Hero real) */}
       <div
         className="
           absolute inset-0 pointer-events-none
@@ -544,7 +612,6 @@ function Navbar({ isDark, onToggleTheme }) {
 
       <nav className="relative h-16">
         <Container className="h-full flex items-center justify-between">
-          {/* LOGO */}
           <a
             href="#top"
             onClick={(e) => {
@@ -563,7 +630,6 @@ function Navbar({ isDark, onToggleTheme }) {
           </a>
 
           <div className="flex items-center gap-3">
-            {/* LINKS */}
             <ul className="hidden md:flex gap-8 text-sm text-[color:var(--muted)]">
               {links.map((item) => (
                 <li key={item.href} className="group relative">
@@ -594,7 +660,6 @@ function Navbar({ isDark, onToggleTheme }) {
               ))}
             </ul>
 
-            {/* THEME TOGGLE */}
             <button
               type="button"
               onClick={onToggleTheme}
@@ -627,9 +692,12 @@ function Navbar({ isDark, onToggleTheme }) {
   );
 }
 
-
-
-/* ================= ABOUT ================= */
+/**
+ * Sección "Sobre mí".
+ * Presenta introducción, enfoque y valores sobre calidad del software.
+ *
+ * @returns {JSX.Element}
+ */
 function AboutSection() {
   return (
     <section
@@ -658,15 +726,27 @@ function AboutSection() {
               className="space-y-6 leading-relaxed text-[17px] min-w-0 text-[color:var(--muted)]"
             >
               <p>
-                Soy programador Full Stack enfocado en desarrollo web y egresado de la Universidad Tecnológica Nacional (UTN). Me especializo en crear soluciones digitales pensadas para resolver problemas reales, priorizando siempre la simplicidad, la claridad y la utilidad.
+                Soy programador Full Stack enfocado en desarrollo web y egresado
+                de la Universidad Tecnológica Nacional (UTN). Me especializo en
+                crear soluciones digitales pensadas para resolver problemas
+                reales, priorizando siempre la simplicidad, la claridad y la
+                utilidad.
               </p>
 
               <p>
-                Creo firmemente que el buen software no solo debe funcionar, sino también entenderse. Cada línea de código que escribo tiene un propósito concreto: aportar valor desde el primer uso, facilitar la experiencia del usuario y mantenerse clara y sostenible en el tiempo.
+                Creo firmemente que el buen software no solo debe funcionar,
+                sino también entenderse. Cada línea de código que escribo tiene
+                un propósito concreto: aportar valor desde el primer uso,
+                facilitar la experiencia del usuario y mantenerse clara y
+                sostenible en el tiempo.
               </p>
 
               <p>
-                Disfruto trabajar en proyectos donde la tecnología es una herramienta para mejorar procesos, optimizar tiempos y brindar soluciones prácticas. Me siento cómodo tanto en el frontend como en el backend, y valoro el código limpio, bien estructurado y orientado a resultados.
+                Disfruto trabajar en proyectos donde la tecnología es una
+                herramienta para mejorar procesos, optimizar tiempos y brindar
+                soluciones prácticas. Me siento cómodo tanto en el frontend como
+                en el backend, y valoro el código limpio, bien estructurado y
+                orientado a resultados.
               </p>
             </motion.div>
           </div>
@@ -676,7 +756,13 @@ function AboutSection() {
   );
 }
 
-/* ================= PROJECTS ================= */
+/**
+ * Sección de proyectos destacados.
+ * Renderiza tarjetas de proyectos con estructura narrada:
+ * problema / solución / decisiones / resultado.
+ *
+ * @returns {JSX.Element}
+ */
 function Projects() {
   return (
     <section
@@ -699,6 +785,7 @@ function Projects() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10">
             <ProjectCard
               title="Ampuero & Asoc."
+              href="https://demo-gestion-contable.vercel.app/dashboard"
               problem="El estudio contable gestionaba compras y ventas mediante planillas de Excel, lo que generaba riesgo de errores en la carga manual de comprobantes, dificultades para discriminar correctamente impuestos y posibles alteraciones accidentales de datos."
               solution="Desarrollo de un sistema web que centraliza la carga de comprobantes, automatiza la discriminación de impuestos (gravados y no gravados) y permite generar informes impositivos claros y confiables para la gestión contable diaria."
               decisions="Se diseñó un sistema orientado a minimizar errores de carga mediante validaciones y estructura de datos clara. La solución reemplaza el uso de planillas por un entorno web controlado, asegurando integridad de la información, facilidad de uso y escalabilidad futura."
@@ -712,96 +799,146 @@ function Projects() {
   );
 }
 
-/* ================= PROJECT CARD ================= */
-function ProjectCard({ title, problem, solution, decisions, result, tech }) {
+/**
+ * Tarjeta de proyecto clickeable.
+ * Si el href es externo, se abre en una nueva pestaña.
+ *
+ * @param {object} props
+ * @param {string} props.title Título del proyecto.
+ * @param {string} props.href URL del proyecto.
+ * @param {string} props.problem Descripción del problema.
+ * @param {string} props.solution Descripción de la solución.
+ * @param {string} props.decisions Decisiones técnicas tomadas.
+ * @param {string} props.result Resultado/impacto.
+ * @param {string[]} props.tech Tecnologías usadas.
+ * @returns {JSX.Element}
+ */
+function ProjectCard({ title, href, problem, solution, decisions, result, tech }) {
+  const isExternal =
+    typeof href === "string" &&
+    (href.startsWith("http://") || href.startsWith("https://"));
+
   return (
-    <motion.article
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
+    <a
+      href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      aria-label={`Abrir proyecto: ${title}`}
       className="
-        group relative overflow-hidden
-        rounded-2xl border border-[color:var(--border)]
-        bg-[var(--bg2)]
-        transition
-        hover:border-violet-500/40
-        hover:shadow-[0_0_0_1px_rgba(139,92,246,0.25)]
+        block
+        rounded-2xl
+        focus:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-violet-500/70
+        focus-visible:ring-offset-2
+        focus-visible:ring-offset-[var(--bg)]
       "
-      aria-labelledby={`${title}-title`}
     >
-      <div
-        aria-hidden="true"
+      <motion.article
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
         className="
-          pointer-events-none absolute inset-0 opacity-0
-          bg-gradient-to-br from-violet-500/10 via-transparent to-transparent
-          transition-opacity duration-300
-          group-hover:opacity-100
+          group relative overflow-hidden
+          rounded-2xl border border-[color:var(--border)]
+          bg-[var(--bg2)]
+          transition
+          hover:border-violet-500/40
+          hover:shadow-[0_0_0_1px_rgba(139,92,246,0.25)]
+          cursor-pointer
         "
-      />
+        aria-labelledby={`${title}-title`}
+      >
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none absolute inset-0 opacity-0
+            bg-gradient-to-br from-violet-500/10 via-transparent to-transparent
+            transition-opacity duration-300
+            group-hover:opacity-100
+          "
+        />
 
-      <div className="relative p-6 sm:p-8">
-        <div className="flex items-start justify-between gap-6 mb-6">
-          <h3
-            id={`${title}-title`}
-            className="text-xl font-semibold tracking-tight text-[color:var(--text)]"
-          >
-            {title}
-          </h3>
+        <span aria-hidden="true" className="absolute inset-0" />
 
-          <span
-            className="
-              inline-flex items-center justify-center
-              rounded-full border border-[color:var(--border)]
-              bg-[var(--card)]
-              p-2
-              text-[color:var(--muted)]
-              transition
-              group-hover:text-[color:var(--text)] group-hover:border-violet-500/30
-              group-focus-within:text-[color:var(--text)]
-            "
-          >
-            <ArrowUpRight
-              aria-hidden="true"
-              focusable="false"
-              className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
-          </span>
-        </div>
+        <div className="relative p-6 sm:p-8">
+          <div className="flex items-start justify-between gap-6 mb-6">
+            <h3
+              id={`${title}-title`}
+              className="text-xl font-semibold tracking-tight text-[color:var(--text)]"
+            >
+              {title}
+            </h3>
 
-        <div className="space-y-6 text-sm leading-relaxed">
-          <ProjectBlock label="EL PROBLEMA">{problem}</ProjectBlock>
-          <ProjectBlock label="LA SOLUCIÓN">{solution}</ProjectBlock>
-          <ProjectBlock label="DECISIONES TÉCNICAS">{decisions}</ProjectBlock>
-          <ProjectBlock label="RESULTADO" highlight>
-            {result}
-          </ProjectBlock>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mt-8">
-          {tech.map((t) => (
             <span
-              key={t}
               className="
-                px-3 py-1 text-xs rounded-full
-                border border-violet-500/30
-                text-violet-600 dark:text-violet-400
-                bg-violet-500/10
+                inline-flex items-center justify-center
+                rounded-full border border-[color:var(--border)]
+                bg-[var(--card)]
+                p-2
+                text-[color:var(--muted)]
                 transition
-                group-hover:border-violet-400/60
-                group-hover:text-violet-600 dark:group-hover:text-violet-300
+                group-hover:text-[color:var(--text)] group-hover:border-violet-500/30
+                group-focus-within:text-[color:var(--text)]
               "
             >
-              {t}
+              <ArrowUpRight
+                aria-hidden="true"
+                focusable="false"
+                className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
             </span>
-          ))}
+          </div>
+
+          <div className="space-y-6 text-sm leading-relaxed">
+            <ProjectBlock label="EL PROBLEMA">{problem}</ProjectBlock>
+            <ProjectBlock label="LA SOLUCIÓN">{solution}</ProjectBlock>
+            <ProjectBlock label="DECISIONES TÉCNICAS">{decisions}</ProjectBlock>
+            <ProjectBlock label="RESULTADO" highlight>
+              {result}
+            </ProjectBlock>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-8">
+            {tech.map((t) => (
+              <span
+                key={t}
+                className="
+                  px-3 py-1 text-xs rounded-full
+                  border border-violet-500/30
+                  text-violet-600 dark:text-violet-400
+                  bg-violet-500/10
+                  transition
+                  group-hover:border-violet-400/60
+                  group-hover:text-violet-600 dark:group-hover:text-violet-300
+                "
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {isExternal && (
+            <span className="sr-only">(se abre en una pestaña nueva)</span>
+          )}
         </div>
-      </div>
-    </motion.article>
+      </motion.article>
+    </a>
   );
 }
 
+/**
+ * Bloque de contenido dentro de una tarjeta de proyecto.
+ * Permite un modo destacado para resaltar el resultado.
+ *
+ * @param {object} props
+ * @param {string} props.label Encabezado del bloque.
+ * @param {*} props.children Contenido del bloque.
+ * @param {boolean} [props.highlight] Resalta el texto con color principal.
+ * @returns {JSX.Element}
+ */
 function ProjectBlock({ label, children, highlight = false }) {
   return (
     <div>
@@ -819,7 +956,12 @@ function ProjectBlock({ label, children, highlight = false }) {
   );
 }
 
-/* ================= STACK TÉCNICO ================= */
+/**
+ * Sección de stack técnico + educación.
+ * Presenta cards por categoría y un bloque de educación al final.
+ *
+ * @returns {JSX.Element}
+ */
 function StackTecnico() {
   return (
     <section
@@ -909,7 +1051,17 @@ function StackTecnico() {
   );
 }
 
-/* ================= STACK CARD ================= */
+/**
+ * Card de stack.
+ * Muestra un ícono, título y lista de items.
+ *
+ * @param {object} props
+ * @param {*} props.icon Ícono renderizado.
+ * @param {string} props.title Título del bloque.
+ * @param {string[]} props.items Lista de items.
+ * @param {boolean} [props.nowrapTitle] Evita salto de línea en el título.
+ * @returns {JSX.Element}
+ */
 function StackCard({ icon, title, items, nowrapTitle = false }) {
   return (
     <motion.article
@@ -957,7 +1109,12 @@ function StackCard({ icon, title, items, nowrapTitle = false }) {
   );
 }
 
-/* ================= FOOTER ================= */
+/**
+ * Footer: cierre con branding, claim y accesos de contacto.
+ * Incluye enlaces externos (GitHub/LinkedIn/WhatsApp) y mailto.
+ *
+ * @returns {JSX.Element}
+ */
 function Footer() {
   return (
     <footer
@@ -1052,6 +1209,17 @@ function Footer() {
   );
 }
 
+/**
+ * Link de footer con tratamiento consistente:
+ * - Soporta enlaces externos abriendo nueva pestaña.
+ * - Incluye focus ring accesible y hover con acento violeta.
+ *
+ * @param {object} props
+ * @param {string} props.href URL del enlace.
+ * @param {*} props.children Ícono/children del enlace.
+ * @param {string} props.label Texto accesible (aria-label).
+ * @returns {JSX.Element}
+ */
 function FooterLink({ href, children, label }) {
   const isExternal =
     typeof href === "string" &&
@@ -1104,7 +1272,9 @@ function FooterLink({ href, children, label }) {
         />
       </span>
 
-      {isExternal && <span className="sr-only">(se abre en una pestaña nueva)</span>}
+      {isExternal && (
+        <span className="sr-only">(se abre en una pestaña nueva)</span>
+      )}
     </a>
   );
 }
