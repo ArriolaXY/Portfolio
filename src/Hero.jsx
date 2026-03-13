@@ -282,7 +282,7 @@ function Hero({ isDark }) {
         opacity-80
       "
                 />
-                Ver proyectos
+                Experiencias
               </a>
 
               <a
@@ -583,7 +583,7 @@ function GraphBackground({ isDark }) {
 function Navbar({ isDark, onToggleTheme }) {
   const links = [
     { label: "Sobre mí", href: "#about" },
-    { label: "Proyectos", href: "#projects" },
+    { label: "Experiencias", href: "#projects" },
     { label: "Contacto", href: "#contact" },
   ];
 
@@ -777,19 +777,21 @@ function Projects() {
               id="projects-title"
               className="text-3xl font-semibold text-[color:var(--text)]"
             >
-              Proyectos Destacados
+              Experiencias
             </h2>
             <div className="mt-3 h-[3px] w-12 bg-violet-500" />
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10">
+          <div className="grid grid-cols-1 gap-6 sm:gap-8 md:gap-10 max-w-3xl mx-auto">
             <ProjectCard
               title="Estudio Contable Ampuero & Asoc."
+              subtitle="San Miguel de Tucumán, Argentina (2025)"
+              href="https://www.instagram.com/estudiocontable_ampuero/"
               problem="El estudio contable gestionaba compras y ventas mediante planillas de Excel, lo que generaba riesgo de errores en la carga manual de comprobantes, dificultades para discriminar correctamente impuestos y posibles alteraciones accidentales de datos."
               solution="Desarrollo de un sistema web que centraliza la carga de comprobantes, automatiza la discriminación de impuestos (gravados y no gravados) y permite generar informes impositivos claros y confiables para la gestión contable diaria."
               decisions="Se diseñó un sistema orientado a minimizar errores de carga mediante validaciones y estructura de datos clara. La solución reemplaza el uso de planillas por un entorno web controlado, asegurando integridad de la información, facilidad de uso y escalabilidad futura."
               result="Sistema web funcional que optimiza la gestión contable del estudio, reduce errores en la carga de comprobantes y mejora la generación de informes impositivos, permitiendo al estudio trabajar de manera más profesional y automatizada."
-              tech={["React", "Node.js", "Express", "MySQL", "JWT"]}
+              tech={["React", "Node.js", "Express", "JWT", "MySQL"]}
             />
           </div>
         </Content>
@@ -812,7 +814,16 @@ function Projects() {
  * @param {string[]} props.tech Tecnologías usadas.
  * @returns {JSX.Element}
  */
-function ProjectCard({ title, href, problem, solution, decisions, result, tech }) {
+function ProjectCard({
+  title,
+  subtitle,
+  href,
+  problem,
+  solution,
+  decisions,
+  result,
+  tech,
+}) {
   const isExternal =
     typeof href === "string" &&
     (href.startsWith("http://") || href.startsWith("https://"));
@@ -864,12 +875,20 @@ function ProjectCard({ title, href, problem, solution, decisions, result, tech }
 
         <div className="relative p-6 sm:p-8">
           <div className="flex items-start justify-between gap-6 mb-6">
-            <h3
-              id={`${title}-title`}
-              className="text-xl font-semibold tracking-tight text-[color:var(--text)]"
-            >
-              {title}
-            </h3>
+            <div>
+              <h3
+                id={`${title}-title`}
+                className="text-xl font-semibold tracking-tight text-[color:var(--text)]"
+              >
+                {title}
+              </h3>
+
+              {subtitle && (
+                <p className="text-sm text-[color:var(--muted)] mt-1">
+                  {subtitle}
+                </p>
+              )}
+            </div>
 
             <span
               className="
