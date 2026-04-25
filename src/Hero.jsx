@@ -6,9 +6,11 @@ import {
   Wrench,
   Sun,
   Moon,
+  Menu,
+  X,
 } from "lucide-react";
 import { FaGithub, FaLinkedinIn, FaEnvelope, FaWhatsapp } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState, useRef } from "react";
 
 /**
@@ -234,7 +236,7 @@ function Hero({ isDark }) {
               FULL STACK WEB DEVELOPER
             </span>
 
-            <h1 className="mt-5 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold leading-tight text-[color:var(--text)]">
+            <h1 className="mt-5 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.15] text-[color:var(--text)]">
               Convierto ideas en herramientas digitales.
             </h1>
 
@@ -581,13 +583,17 @@ function GraphBackground({ isDark }) {
  * @returns {JSX.Element}
  */
 function Navbar({ isDark, onToggleTheme }) {
+  const [isOpen, setIsOpen] = useState(false);
   const links = [
     { label: "Sobre mí", href: "#about" },
     { label: "Proyectos", href: "#projects" },
     { label: "Contacto", href: "#contact" },
   ];
 
-  const handleClick = (e, href) => smoothScrollToHash(e, href);
+  const handleClick = (e, href) => {
+    smoothScrollToHash(e, href);
+    setIsOpen(false);
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
@@ -629,8 +635,8 @@ function Navbar({ isDark, onToggleTheme }) {
             Nahuel Arriola
           </a>
 
-          <div className="flex items-center gap-3">
-            <ul className="hidden md:flex gap-8 text-sm text-[color:var(--muted)]">
+          <div className="flex items-center gap-1 sm:gap-3">
+            <ul className="hidden md:flex gap-8 text-sm text-[color:var(--muted)] mr-4">
               {links.map((item) => (
                 <li key={item.href} className="group relative">
                   <a
@@ -685,9 +691,73 @@ function Navbar({ isDark, onToggleTheme }) {
                 <Moon size={18} aria-hidden="true" />
               )}
             </button>
+
+            <button
+              type="button"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle mobile menu"
+              className="
+                md:hidden
+                inline-flex items-center justify-center
+                p-2 rounded-md
+                text-[color:var(--muted)]
+                hover:text-[color:var(--text)]
+                hover:bg-black/5
+                dark:hover:bg-white/5
+                transition
+                focus:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-violet-500/70
+              "
+            >
+              {isOpen ? (
+                <X size={20} aria-hidden="true" />
+              ) : (
+                <Menu size={20} aria-hidden="true" />
+              )}
+            </button>
           </div>
         </Container>
       </nav>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 top-16 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-40 md:hidden"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-16 left-0 w-full bg-[color:var(--bg)] border-b border-[color:var(--border)] z-50 md:hidden shadow-2xl"
+            >
+              <nav className="flex flex-col p-4 gap-3">
+                {links.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => handleClick(e, item.href)}
+                    className="
+                      flex items-center w-full p-4 rounded-xl
+                      text-base font-medium text-[color:var(--text)]
+                      bg-[var(--card)] hover:bg-violet-500/10
+                      border border-[color:var(--border)] hover:border-violet-500/30
+                      transition-all
+                    "
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
@@ -723,7 +793,7 @@ function AboutSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.55, ease: "easeOut" }}
-              className="space-y-6 leading-relaxed text-[17px] min-w-0 text-[color:var(--muted)]"
+              className="space-y-6 leading-relaxed text-base sm:text-[17px] min-w-0 text-[color:var(--muted)]"
             >
               <p>
                 Soy programador Full Stack enfocado en desarrollo web y egresado
@@ -885,7 +955,7 @@ function ProjectCard({
 
         <span aria-hidden="true" className="absolute inset-0" />
 
-        <div className="relative p-6 sm:p-8">
+        <div className="relative p-5 sm:p-8">
           <div className="flex items-start justify-between gap-6 mb-6">
             <div>
               <h3
@@ -1103,7 +1173,7 @@ function StackCard({ icon, title, items, nowrapTitle = false }) {
       className="
         rounded-2xl border border-[color:var(--border)]
         bg-[var(--card)]
-        p-7
+        p-6 sm:p-7
         transition
         hover:border-violet-500/35 hover:bg-black/5 dark:hover:bg-white/[0.035]
         hover:shadow-[0_0_0_1px_rgba(139,92,246,0.18)]
@@ -1175,7 +1245,7 @@ function Footer() {
               </div>
 
               <nav aria-label="Enlaces de contacto" className="w-full md:w-auto">
-                <ul className="flex flex-wrap items-center gap-3 md:gap-4">
+                <ul className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap md:gap-4 w-full">
                   <li>
                     <FooterLink
                       href="https://github.com/ArriolaXY"
@@ -1262,9 +1332,9 @@ function FooterLink({ href, children, label }) {
       rel={isExternal ? "noopener noreferrer" : undefined}
       aria-label={label}
       className="
-        group inline-flex items-center gap-2
+        group flex w-full justify-center sm:inline-flex items-center gap-2
         rounded-full
-        px-4 py-2
+        px-3 py-2.5 sm:px-4 sm:py-2
         text-sm
         border border-[color:var(--border)]
         bg-[var(--card)]
