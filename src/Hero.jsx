@@ -583,7 +583,7 @@ function GraphBackground({ isDark }) {
 function Navbar({ isDark, onToggleTheme }) {
   const links = [
     { label: "Sobre mí", href: "#about" },
-    { label: "Experiencias", href: "#projects" },
+    { label: "Proyectos", href: "#projects" },
     { label: "Contacto", href: "#contact" },
   ];
 
