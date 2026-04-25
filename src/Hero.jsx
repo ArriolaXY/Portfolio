@@ -777,14 +777,14 @@ function Projects() {
               id="projects-title"
               className="text-3xl font-semibold text-[color:var(--text)]"
             >
-              Experiencias
+              Proyectos y Experiencias
             </h2>
             <div className="mt-3 h-[3px] w-12 bg-violet-500" />
           </header>
 
           <div className="grid grid-cols-1 gap-6 sm:gap-8 md:gap-10 max-w-3xl mx-auto">
             <ProjectCard
-              title="Estudio Contable Ampuero & Asoc."
+              title="Estudio Contable Ampuero & Asoc. (Experiencia)"
               subtitle="San Miguel de Tucumán, Argentina (2025)"
               href="https://www.instagram.com/estudiocontable_ampuero/"
               problem="El estudio contable gestionaba compras y ventas mediante planillas de Excel, lo que generaba riesgo de errores en la carga manual de comprobantes, dificultades para discriminar correctamente impuestos y posibles alteraciones accidentales de datos."
@@ -793,7 +793,19 @@ function Projects() {
               result="Sistema web funcional que optimiza la gestión contable del estudio, reduce errores en la carga de comprobantes y mejora la generación de informes impositivos, permitiendo al estudio trabajar de manera más profesional y automatizada."
               tech={["React", "Node.js", "Express", "JWT", "MySQL"]}
             />
+
+            <ProjectCard
+              title="Leadship (Proyecto)"
+              subtitle="Argentina (2026)"
+              href="https://leadship-theta.vercel.app/"
+              problem="Los profesionales locales necesitan visibilidad digital y herramientas para medir el retorno de su presencia online. Paralelamente, la administración de directorios enfrenta desafíos para mantener la calidad de la información, evitar el spam y establecer una vía clara para monetizar el tráfico generado."
+              solution="Desarrollo de una plataforma de directorio que conecta la oferta y la demanda mediante un buscador intuitivo filtrado por categoría y geolocalización. Incluye un portal de autogestión para que los profesionales visualicen analíticas de contacto, junto con un sistema administrativo de moderación y suscripciones."
+              decisions="Se diseñó una arquitectura modular enfocada en el rendimiento y SEO, priorizando el renderizado en el servidor. La solución se apoya en un modelo relacional robusto, una implementación de autenticación a medida con protección anti-spam y la integración externa para automatizar el cobro de suscripciones."
+              result="Plataforma digital altamente escalable que optimiza el descubrimiento de profesionales locales. El sistema asegura un excelente posicionamiento en buscadores y automatiza el ciclo comercial completo, desde el contacto inicial hasta la monetización de los perfiles."
+              tech={["Next.js", "React", "TypeScript", "PostgreSQL", "Prisma", "Tailwind CSS"]}
+            />
           </div>
+
         </Content>
       </Container>
     </section>
